@@ -1,0 +1,20 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="ETP = ZAD" directorySegmentName="seg_0" id="F977E664-B96A-7840-D778-B75AAF563A4E">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-04 15:46:25 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<targetTransferable>false</targetTransferable>
+<sourcePk>23B53898-55EA-36F9-1214-C011FDBE910E</sourcePk>
+<identifying>true</identifying>
+<optionalSource>true</optionalSource>
+<optionalTarget>false</optionalTarget>
+<sourceCardinality>1</sourceCardinality>
+<sourceEntity>0868AD83-4BA4-CDA2-0EE9-BCFCC6054115</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>022E6A8F-5F56-9C37-F6B1-01B46B7D42BE</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>

@@ -1,0 +1,19 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="UZY -ETP" directorySegmentName="seg_0" id="14BC27AF-458A-3C5B-4E25-94EA31F4A4F0">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 07:44:44 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<sourcePk>93E897AA-2727-4476-F209-E5ECB22BD49F</sourcePk>
+<identifying>false</identifying>
+<optionalSource>true</optionalSource>
+<optionalTarget>false</optionalTarget>
+<sourceCardinality>1</sourceCardinality>
+<sourceEntity>3A6BDF64-C0F2-1A15-FF05-2127952CE72D</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>0868AD83-4BA4-CDA2-0EE9-BCFCC6054115</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>

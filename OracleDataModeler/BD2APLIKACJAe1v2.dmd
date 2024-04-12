@@ -1,0 +1,8 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="BD2APLIKACJAe1v2" id="F9E5FD9B-DAC4-791B-53B1-284AEE7004AE" version="3.5">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-04 15:27:46 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1</ownerDesignName>
+<capitalNames>false</capitalNames>
+<designId>F9E5FD9B-DAC4-791B-53B1-284AEE7004AE</designId>
+</OSDM_Design>

@@ -1,0 +1,66 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="D1157F42-C18C-812B-9C74-07E1F809DB7E" name="POZYCJA KATEGORII">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 07:46:01 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<preferredAbbreviation>POZ</preferredAbbreviation>
+<shortName>POZ</shortName>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="Kod_kategorii" id="F2512AA8-2D20-CF32-0F7E-9060849B2FC9">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 07:48:21 UTC</createdTime>
+<generatorID>47B4ED44-EE1E-3258-D4C6-83AEB8B8C117</generatorID>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<referedAttribute>B2CD4C0C-C8B0-B62F-17E2-10F2A5AA6DE7</referedAttribute>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>8</dataTypeSize>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="Id_etapu" id="F9374795-FACD-8D99-47BA-00FD3E85E1C9">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 07:49:02 UTC</createdTime>
+<generatorID>A41BB53C-467C-7D66-A684-AD75F24CE6CB</generatorID>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<referedAttribute>F72FF006-A6E3-9F1F-2DDB-40B691D87B4E</referedAttribute>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>4</dataTypePrecision>
+<ownDataTypeParameters>,4,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="EE089E1D-F58F-5E8E-44BE-9ACEB320BC66" name="POZYCJA KATEGORII PK">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 07:48:21 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>F2512AA8-2D20-CF32-0F7E-9060849B2FC9</attributeRef>
+<attributeRef>F9374795-FACD-8D99-47BA-00FD3E85E1C9</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

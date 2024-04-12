@@ -1,0 +1,20 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="KAT-POZ" directorySegmentName="seg_0" id="47B4ED44-EE1E-3258-D4C6-83AEB8B8C117">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 07:48:21 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<targetTransferable>false</targetTransferable>
+<sourcePk>02FE5BC8-7D10-0237-9B63-B5A07697D22A</sourcePk>
+<identifying>true</identifying>
+<optionalSource>true</optionalSource>
+<optionalTarget>false</optionalTarget>
+<sourceCardinality>1</sourceCardinality>
+<sourceEntity>96BF1403-20F9-24DD-2444-BD7CE0B585AC</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>D1157F42-C18C-812B-9C74-07E1F809DB7E</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>

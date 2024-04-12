@@ -1,0 +1,20 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="ETP-POZ" directorySegmentName="seg_0" id="A41BB53C-467C-7D66-A684-AD75F24CE6CB">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 07:49:02 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<targetTransferable>false</targetTransferable>
+<sourcePk>23B53898-55EA-36F9-1214-C011FDBE910E</sourcePk>
+<identifying>true</identifying>
+<optionalSource>true</optionalSource>
+<optionalTarget>false</optionalTarget>
+<sourceCardinality>1</sourceCardinality>
+<sourceEntity>0868AD83-4BA4-CDA2-0EE9-BCFCC6054115</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>D1157F42-C18C-812B-9C74-07E1F809DB7E</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>

@@ -1,0 +1,99 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="3A6BDF64-C0F2-1A15-FF05-2127952CE72D" name="UZYTKOWNIK">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 07:31:10 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<preferredAbbreviation>UZY</preferredAbbreviation>
+<shortName>UZY</shortName>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="Id_uzytkonika" id="AEFD8556-7964-67CC-8D57-E65A50733437">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 07:32:53 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>4</dataTypePrecision>
+<ownDataTypeParameters>,4,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="Login" id="44E0CBB0-BB45-E560-F635-A7DF2D27D2DC">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 07:33:22 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>20</dataTypeSize>
+<ownDataTypeParameters>20,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="Haslo" id="5DFF2C75-C505-6C9B-D9A4-218657FBCFEE">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 19:35:22 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>40</dataTypeSize>
+<ownDataTypeParameters>40,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="Salt" id="D169F464-83C5-8EAB-2FA5-592969BD5F89">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 19:37:56 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>16</dataTypeSize>
+<ownDataTypeParameters>16,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="93E897AA-2727-4476-F209-E5ECB22BD49F" name="UZYTKOWNIK PK">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 07:34:56 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>AEFD8556-7964-67CC-8D57-E65A50733437</attributeRef>
+</usedAttributes>
+</identifier>
+<identifier id="6ABE0654-8798-ADB2-A262-8A8DFFFD99FC" name="UZYTKOWNIK UK">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 07:51:02 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<newElementsIDs>44E0CBB0-BB45-E560-F635-A7DF2D27D2DC</newElementsIDs>
+<usedAttributes>
+<attributeRef>44E0CBB0-BB45-E560-F635-A7DF2D27D2DC</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

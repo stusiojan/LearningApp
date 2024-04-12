@@ -1,0 +1,117 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="022E6A8F-5F56-9C37-F6B1-01B46B7D42BE" name="ZADANIE">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-04 15:41:06 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<preferredAbbreviation>ZAD</preferredAbbreviation>
+<shortName>ZAD</shortName>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="Nazwa" id="294D8A00-0C14-63B4-D2A0-B75B10752F61">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-04 15:42:12 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>30</dataTypeSize>
+<ownDataTypeParameters>30,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="Liczba_porzadkowa" id="8DC31CBB-13BE-8298-0F46-9BE443EA4A53">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-04 15:42:35 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>2</dataTypePrecision>
+<ownDataTypeParameters>,2,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="Czy_wykonane" id="1DA58A0D-20F4-6E13-DF54-3DAA77CD8694">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-04 15:43:12 UTC</createdTime>
+<commentInRDBMS><![CDATA[0 lub 1]]></commentInRDBMS>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>1</dataTypePrecision>
+<ownDataTypeParameters>,1,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="Opis" id="30C8E684-172B-B2C5-F16E-CE3916797CE9">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-04 15:45:46 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>200</dataTypeSize>
+<ownDataTypeParameters>200,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="Id_etapu" id="14D967B0-1200-7C5B-1960-C2E402159E09">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-04 15:46:25 UTC</createdTime>
+<generatorID>F977E664-B96A-7840-D778-B75AAF563A4E</generatorID>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<referedAttribute>F72FF006-A6E3-9F1F-2DDB-40B691D87B4E</referedAttribute>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>4</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="A3DE4842-6827-8569-67F4-73847671AFA4" name="ETAP PK">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-04 15:46:25 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>14D967B0-1200-7C5B-1960-C2E402159E09</attributeRef>
+</usedAttributes>
+</identifier>
+<identifier id="6EFE8849-2466-9246-AA10-06797AB75400" name="ETAP UK">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-04 15:47:22 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<newElementsIDs>294D8A00-0C14-63B4-D2A0-B75B10752F61,8DC31CBB-13BE-8298-0F46-9BE443EA4A53</newElementsIDs>
+<usedAttributes>
+<attributeRef>294D8A00-0C14-63B4-D2A0-B75B10752F61</attributeRef>
+<attributeRef>8DC31CBB-13BE-8298-0F46-9BE443EA4A53</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

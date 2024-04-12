@@ -1,0 +1,88 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="96BF1403-20F9-24DD-2444-BD7CE0B585AC" name="KATEGORIA">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 07:14:55 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<preferredAbbreviation>KAT</preferredAbbreviation>
+<shortName>KAT</shortName>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="Kod_kategorii" id="B2CD4C0C-C8B0-B62F-17E2-10F2A5AA6DE7">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 07:15:53 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>8</dataTypeSize>
+<ownDataTypeParameters>8,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="nazwa" id="F10D955B-6DE6-8321-045C-BC553F7C2E96">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 07:17:06 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>30</dataTypeSize>
+<ownDataTypeParameters>30,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="Opis" id="E70CFEF5-7595-1792-C6E9-50BE2FF03C98">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 07:18:06 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>200</dataTypeSize>
+<ownDataTypeParameters>200,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="02FE5BC8-7D10-0237-9B63-B5A07697D22A" name="KATEGORIA PK">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 07:17:32 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<newElementsIDs>B2CD4C0C-C8B0-B62F-17E2-10F2A5AA6DE7</newElementsIDs>
+<usedAttributes>
+<attributeRef>B2CD4C0C-C8B0-B62F-17E2-10F2A5AA6DE7</attributeRef>
+</usedAttributes>
+</identifier>
+<identifier id="A90817F6-A254-8FD0-3540-3F2D1168BCB5" name="KATEGORIA UK">
+<createdBy>jan</createdBy>
+<createdTime>2024-04-12 07:51:27 UTC</createdTime>
+<ownerDesignName>BD2APLIKACJAe1v2</ownerDesignName>
+<engineerTo>
+<item key="53BCB8CD-4BC2-746B-8A90-23EF6F259026" value="true"/>
+</engineerTo>
+<newElementsIDs>F10D955B-6DE6-8321-045C-BC553F7C2E96</newElementsIDs>
+<usedAttributes>
+<attributeRef>F10D955B-6DE6-8321-045C-BC553F7C2E96</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>
