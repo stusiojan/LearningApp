@@ -17,3 +17,7 @@ kategoria - etap (milestone) - zadanie
     Niemiecki -> Słownictwo, Strona Bierna, ... -> Zadania dla milestone Słownictwo ( słownictwo z rozdziału 1, ... )
 
 W folderze `OracleDataModeler` zamieszczone są pliki umożliwiające otworzenie modelu w Oracle Data Modeler.
+
+## Milestone 2
+
+W plikach `Barker_e2.pdf` oraz `Bachman_e2.pdf` znajduje się zaktualizowany szkic.
