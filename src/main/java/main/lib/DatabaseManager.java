@@ -1,7 +1,8 @@
 package main.lib;
 
 import java.sql.*;
-import main.lib.Config;
+import java.util.ArrayList;
+import java.util.function.Function;
 
 /** The "static" class dealing with database connection. */
 public class DatabaseManager {
@@ -12,16 +13,26 @@ public class DatabaseManager {
     }
     public static void connect(boolean forTesting) throws SQLException {
         String databaseName = forTesting ? Config.getTestDatabaseName() : Config.getDatabaseName();
+        connection = DriverManager.getConnection(Config.getConnectionString() + databaseName, Config.getDatabaseUser(), Config.getDatabasePassword());
+    }
 
+    public static void disconnect() throws SQLException{
+        connection.close();
+    }
+
+    public static <T> T[] selectQuery(String query, Function<ResultSet, T> function, Function<Integer, T[]> arrayMaker) {
+        ArrayList<T> list = new ArrayList<>();
         try {
-            connection = DriverManager.getConnection(Config.getConnectionString() + databaseName, Config.getDatabaseUser(), Config.getDatabasePassword());
-            if (connection != null) {
-                System.out.println("Connected to the database!");
-            } else {
-                System.out.println("Failed to make connection!");
+            Statement statement = connection.createStatement();
+            ResultSet result = statement.executeQuery(query);
+            while(result.next()) {
+                list.add(function.apply(result));
             }
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
+            throw new RuntimeException("Query failed:" + ex.getMessage());
         }
+        T[] array = arrayMaker.apply(list.size());
+        return list.toArray(array);
     }
+
 }

@@ -1,6 +1,5 @@
 package main.lib;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -14,7 +13,7 @@ public class Config {
 
     static {
         String configPath = System.getProperty("user.dir");
-        if (configPath.endsWith("/target")) {
+        if (configPath.endsWith("/target") || configPath.endsWith("\\target")) {
             // cut /target if the program is run from jar
             configPath = configPath.substring(0, configPath.length() - 7);
         }

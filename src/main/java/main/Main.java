@@ -23,6 +23,9 @@ public class Main {
             mainPanel = new JPanel();
             mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
+            JLabel label = new JLabel("Hello world");
+            mainPanel.add(label);
+
             // adding panels
 
             mainFrame.setContentPane(mainPanel);
