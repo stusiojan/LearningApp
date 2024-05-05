@@ -3,19 +3,13 @@ package main;
 import main.lib.DatabaseManager;
 import javax.swing.*;
 //import main.gui.*;
-import java.sql.SQLException;
 
 public class Main {
     public static JFrame mainFrame;
     private static JPanel mainPanel;
 
     public static void main(String[] args) {
-        try {
-            DatabaseManager.connect();
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-        }
-
+        DatabaseManager.connect();
 
         SwingUtilities.invokeLater( () -> {
             mainFrame = new JFrame();
@@ -36,6 +30,5 @@ public class Main {
 
     }
 
-    public static void a() {
-    }
+    // public static void a() {}
 }
