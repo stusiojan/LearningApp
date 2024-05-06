@@ -1,0 +1,12 @@
+SET SERVEROUTPUT ON;
+SPOOL &1;
+SET TRIMSPOOL ON;
+DECLARE
+    home_path VARCHAR2 (200);
+BEGIN
+    SELECT sys_context('USERENV', 'ORACLE_HOME') INTO home_path FROM dual;
+    DBMS_OUTPUT.PUT_LINE(home_path);
+END;
+/
+SPOOL OFF;
+QUIT

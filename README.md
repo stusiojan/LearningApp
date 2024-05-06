@@ -28,12 +28,9 @@ Uwaga: nazwy baz danych oraz loginu i hasła do nich można dostosować - w taki
 Pobrać i zainstalować Javę w wersji co najmniej 21: https://www.oracle.com/java/technologies/downloads/
 
 Pobrać i zainstalować bazę danych Oracle: https://www.oracle.com/database/technologies/oracle-database-software-downloads.html <br>
-Przy instalacji Oracle trzeba zapamiętać wybrane hasło i ścieżkę instalacji - będą potrzebne później.
-Dalsze instrukcje zakładają wybranie Oracle Database 21c XE i mogą nie działać dla innych wersji.
+Instalacja była testowana na Oracle Database 21c XE. Przy instalacji Oracle trzeba zapamiętać wybrane hasło - będzie potrzebne później.
 
-Wyszukać w instalowanych plikach folder `pdbseed` (jeżeli nie ma, można spróbować `pdb$seed`) i wstawić do pliku `config.properties` ścieżkę do folderu nadrzędnego - czyli np. jeżeli ścieżka do folderu to `C:\app\kapic\product\21c\oradata\XE\pdbseed`, to do configu należy wstawić `C:\app\kapic\product\21c\oradata\XE\\` (z drugim ukośnikiem).
-
-Uruchomić plik `setup.bat` - skrypt poprosi o hasło z instalacji Oracle. Baza danych powinna być gotowa do pracy. Jeżeli zajdzie potrzeba jej usunięcia, można skorzystać ze skryptu `drop.bat`.
+Uruchomić plik `setup.bat` - skrypt poprosi o hasło. Baza danych powinna być gotowa do pracy. Jeżeli zajdzie potrzeba jej usunięcia, można skorzystać ze skryptu `drop.bat`.
 
 Plik jar można uruchomić kliknięciem lub terminalową komendą: `java -jar LearningApp-1.0-jar-with-dependencies.jar`
 

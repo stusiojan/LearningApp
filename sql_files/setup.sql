@@ -23,4 +23,4 @@ CONNECT &3/&4@localhost:1521/&2;
 @add_procedures.sql
 @test_data.sql
 
-quit;
+QUIT;
