@@ -7,8 +7,8 @@ public class TestDatabaseManager {
     public void testBasic() {
         DatabaseManager.connect(true);
         Category[] categories = DatabaseManager.selectQuery("SELECT * FROM categories", Category::new, Category[]::new);
-        Assert.assertEquals("Bazy Danych 2", categories[0].getName());
-        Assert.assertEquals("AAAAAAAAAAAAAAAA", DatabaseManager.getSalt("Kacper"));
+        Assert.assertEquals("Niemiecki", categories[0].getName());
+        Assert.assertEquals("a1b2c3d4e5f6g7h8", DatabaseManager.getSalt("user3"));
         Assert.assertEquals("EMPTY", DatabaseManager.getSalt("Random"));
         DatabaseManager.disconnect();
     }

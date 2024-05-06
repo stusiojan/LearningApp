@@ -28,7 +28,8 @@ Uwaga: nazwy baz danych oraz loginu i hasła do nich można dostosować - w taki
 Pobrać i zainstalować Javę w wersji co najmniej 21: https://www.oracle.com/java/technologies/downloads/
 
 Pobrać i zainstalować bazę danych Oracle: https://www.oracle.com/database/technologies/oracle-database-software-downloads.html <br>
-Instalacja była testowana na Oracle Database 21c XE. Przy instalacji Oracle trzeba zapamiętać wybrane hasło - będzie potrzebne później.
+Instalacja była testowana na Oracle Database 21c XE i EE. Przy instalacji Oracle trzeba zapamiętać wybrane hasło - będzie potrzebne później.
+W przypadku instalacji na EE należy pozostawić domyślne opcje i wybrać hasło.
 
 Uruchomić plik `setup.bat` - skrypt poprosi o hasło. Baza danych powinna być gotowa do pracy. Jeżeli zajdzie potrzeba jej usunięcia, można skorzystać ze skryptu `drop.bat`.
 
