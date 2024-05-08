@@ -41,10 +41,10 @@ BEGIN
     FROM   milestones
     WHERE  mil_id = arg_id;
     
-    IF mst_old_done  = mst_old_count AND mst_completed IS     NULL THEN
+    IF mst_old_done = mst_old_count AND mst_completed IS     NULL THEN
         UPDATE milestones SET mil_completed = sysdate WHERE mil_id = arg_id;
     END IF;
-    IF mst_old_done != mst_old_count AND mst_completed IS NOT NULL THEN
+    IF mst_old_done < mst_old_count AND mst_completed IS NOT NULL THEN
         UPDATE milestones SET mil_completed = NULL    WHERE mil_id = arg_id;
     END IF;
 END;

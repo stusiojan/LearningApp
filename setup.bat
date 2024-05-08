@@ -13,7 +13,8 @@ del "temp.txt"
 mkdir %oraclePath%%databaseName%
 mkdir %oraclePath%%testDatabaseName%
 
-cd %~dp0/sql_files
+cd sql_files
+set NLS_LANG=.AL32UTF8
 sqlplus system/%oraclePassword% as sysdba @%~dp0sql_files\setup.sql %databaseName% %testDatabaseName% %databaseUser% %databasePassword% %oraclePath%
 
 pause
