@@ -28,7 +28,7 @@ public class DatabaseManager {
         }
     }
 
-    public static <T> T[] selectQuery(String query, Function<ResultSet, T> function, Function<Integer, T[]> arrayMaker) {
+    private static <T> T[] selectQuery(String query, Function<ResultSet, T> function, Function<Integer, T[]> arrayMaker) {
         ArrayList<T> list = new ArrayList<>();
         try {
             Statement statement = connection.createStatement();
@@ -41,6 +41,10 @@ public class DatabaseManager {
         }
         T[] array = arrayMaker.apply(list.size());
         return list.toArray(array);
+    }
+
+    public static Category[] getCategories() {
+        return selectQuery("SELECT * FROM categories", Category::new, Category[]::new);
     }
 
     public static String getSalt(String login) {
