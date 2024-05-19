@@ -7,13 +7,15 @@ import main.lib.DatabaseManager;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentListener;
+import java.awt.event.ComponentEvent;
 
 import java.util.Arrays;
 import java.security.spec.*;
 import javax.crypto.spec.*;
 import javax.crypto.*;
 
-public class LoginPanel extends JPanel implements ActionListener {
+public class LoginPanel extends JPanel implements ActionListener, ComponentListener {
 
     private JPanel mainPanel;
     private JTextField usernameField;
@@ -71,6 +73,7 @@ public class LoginPanel extends JPanel implements ActionListener {
 
         loginButton.addActionListener(this);
         registerButton.addActionListener(this);
+        addComponentListener(this);
     }
 
     @Override
@@ -79,6 +82,7 @@ public class LoginPanel extends JPanel implements ActionListener {
         
         if (e.getSource() == loginButton) {
             try {
+                // TODO: Refactor all the duplicated code around here (see RegisterPanel.java)
                 boolean loginSucceeded = false;
                 String userLogin = usernameField.getText();
 
@@ -103,6 +107,8 @@ public class LoginPanel extends JPanel implements ActionListener {
 
                     if (expectedHash.equals(providedHash.toString())) {
                         loginSucceeded = true;
+                        usernameField.setText("");
+                        passwordField.setText("");
                         mainPanel.add("app_panel", new AppPanel(mainPanel, userLogin));
                         mainPanel.revalidate();
                         cl.show(mainPanel, "app_panel");
@@ -119,5 +125,23 @@ public class LoginPanel extends JPanel implements ActionListener {
         else if (e.getSource() == registerButton) {
             cl.show(mainPanel, "register_panel");
         }
+    }
+
+    @Override
+    public void componentHidden(ComponentEvent e) {
+
+    }
+    @Override
+    public void componentMoved(ComponentEvent e) {
+
+    }
+    @Override
+    public void componentResized(ComponentEvent e) {
+
+    }
+    @Override
+    public void componentShown(ComponentEvent e) {
+        usernameField.setText("");
+        passwordField.setText("");
     }
 }

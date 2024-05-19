@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentListener;
+import java.awt.event.ComponentEvent;
 import javax.swing.plaf.basic.*;
 
 import main.lib.DatabaseManager;
@@ -14,7 +16,7 @@ import java.security.spec.*;
 import javax.crypto.spec.*;
 import javax.crypto.*;
 
-public class RegisterPanel extends JPanel implements ActionListener {
+public class RegisterPanel extends JPanel implements ActionListener, ComponentListener {
 
     private JPanel mainPanel;
     private JTextField usernameField;
@@ -83,6 +85,7 @@ public class RegisterPanel extends JPanel implements ActionListener {
 
         backButton.addActionListener(this);
         registerButton.addActionListener(this);
+        addComponentListener(this);
     }
 
     private String generateSalt() {
@@ -143,11 +146,33 @@ public class RegisterPanel extends JPanel implements ActionListener {
                     DatabaseManager.addUser(userLogin, userHash.toString(), salt);
                     
                     JOptionPane.showMessageDialog(null, "The user was created.");
+                    usernameField.setText("");
+                    passwordField.setText("");
+                    passwordConfirmField.setText("");
                     cl.show(mainPanel, "login_panel");
                 } catch (Exception exc) {
                     JOptionPane.showMessageDialog(null, "Failed to create a user.", "", JOptionPane.ERROR_MESSAGE);
                 }
             }            
         }
+    }
+
+    @Override
+    public void componentHidden(ComponentEvent e) {
+
+    }
+    @Override
+    public void componentMoved(ComponentEvent e) {
+
+    }
+    @Override
+    public void componentResized(ComponentEvent e) {
+
+    }
+    @Override
+    public void componentShown(ComponentEvent e) {
+        usernameField.setText("");
+        passwordField.setText("");
+        passwordConfirmField.setText("");
     }
 }
