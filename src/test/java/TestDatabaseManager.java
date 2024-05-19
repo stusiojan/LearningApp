@@ -16,4 +16,36 @@ public class TestDatabaseManager {
 
         DatabaseManager.disconnect();
     }
+
+    @Test
+    public void testHasUser() {
+        DatabaseManager.connect(true);
+
+        Assert.assertTrue(DatabaseManager.hasUser("user1"));
+        Assert.assertTrue(DatabaseManager.hasUser("user2"));
+        Assert.assertTrue(DatabaseManager.hasUser("user3"));
+        Assert.assertFalse(DatabaseManager.hasUser("other_user"));
+
+        DatabaseManager.disconnect();
+    }
+
+    @Test
+    public void testAddAndDeleteUser() {
+        DatabaseManager.connect(true);
+
+        String login = "TestUser321";
+        String hash = "83c8eb7ba4a496c82f87e4702f2858a41b1051faf6191b21268033f63ec99924";
+        String salt = "EZ~Il!i)IwodI-kh";
+
+        Assert.assertFalse(DatabaseManager.hasUser(login));
+
+        DatabaseManager.addUser(login, hash, salt);
+        Assert.assertTrue(DatabaseManager.hasUser(login));
+        Assert.assertEquals(salt, DatabaseManager.getSalt(login));
+
+        DatabaseManager.deleteUser(login);
+        Assert.assertFalse(DatabaseManager.hasUser(login));
+
+        DatabaseManager.disconnect();
+    }
 }
