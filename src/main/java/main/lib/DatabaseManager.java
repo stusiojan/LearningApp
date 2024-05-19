@@ -59,4 +59,46 @@ public class DatabaseManager {
         }
     }
 
+    public static String getHash(String login) {
+        String sql = "SELECT hash FROM users WHERE login = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, login);
+            ResultSet result = statement.executeQuery();
+            result.next();
+            return result.getString("hash");
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to add new user: " + e);
+        }
+    }
+
+    public static boolean hasUser(String login) {
+        return !getSalt(login).equals("EMPTY");     // FIXME(?): Could be done better
+    }
+
+    public static void addUser(String login, String hash, String salt) {
+        String sql = "INSERT INTO users (login, hash, salt) VALUES (?, ?, ?)";
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, login);
+            statement.setString(2, hash);
+            statement.setString(3, salt);
+            statement.executeUpdate();
+            statement.close();
+        }  catch (SQLException e) {
+            throw new RuntimeException("Failed to add new user: " + e);
+        }
+    }
+
+    public static void deleteUser(String login) {
+        String sql = "DELETE FROM users WHERE login = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, login);
+            statement.executeUpdate();
+            statement.close();
+        }   catch (SQLException e) {
+            throw new RuntimeException("Failed to delete user: " + e);
+        }
+    }
 }
