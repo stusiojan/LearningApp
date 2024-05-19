@@ -1,6 +1,7 @@
 package main;
 
 import main.lib.DatabaseManager;
+import java.awt.*;
 import javax.swing.*;
 //import main.gui.*;
 
@@ -13,22 +14,16 @@ public class Main {
 
         SwingUtilities.invokeLater( () -> {
             mainFrame = new JFrame();
+            mainFrame.setTitle("LearningApp");
             mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            mainPanel = new JPanel();
-            mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+            
+            mainPanel = new JPanel(new CardLayout());
+            mainPanel.add("login_panel", new LoginPanel(mainPanel));
+            mainPanel.add("register_panel", new RegisterPanel(mainPanel));
 
-            JLabel label = new JLabel("Hello world");
-            mainPanel.add(label);
-
-            // adding panels
-
-            mainFrame.setContentPane(mainPanel);
-            mainFrame.pack();
+            mainFrame.getContentPane().add(mainPanel);
+            mainFrame.pack(); 
             mainFrame.setVisible(true);
         });
-
-
     }
-
-    // public static void a() {}
 }
