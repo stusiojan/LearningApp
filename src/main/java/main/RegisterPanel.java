@@ -6,6 +6,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.plaf.basic.*;
 
+import main.lib.DatabaseManager;
+
+import java.util.Arrays;
+import java.security.SecureRandom;
+import java.security.spec.*;
+import javax.crypto.spec.*;
+import javax.crypto.*;
+
 public class RegisterPanel extends JPanel implements ActionListener {
 
     private JPanel mainPanel;
@@ -77,15 +85,69 @@ public class RegisterPanel extends JPanel implements ActionListener {
         registerButton.addActionListener(this);
     }
 
+    private String generateSalt() {
+        // FIXME: should probably be in a different class.
+        final int SALT_LENGTH = 16;
+        final String CHARSET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~";
+
+        SecureRandom sr = new SecureRandom();
+
+        String salt = "";
+        for (int i = 0; i < SALT_LENGTH; i++)
+        {   
+            int index = sr.nextInt(CHARSET.length());
+            salt += CHARSET.charAt(index);
+        }
+        return salt;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         CardLayout cl = (CardLayout)mainPanel.getLayout();
         
         if (e.getSource() == backButton) {
-            //mainPanel.removeAll();
-            //mainPanel.add("login_panel", new LoginPanel(mainPanel));
-            //mainPanel.revalidate();
             cl.show(mainPanel, "login_panel");
+        }
+        else if (e.getSource() == registerButton) {
+            String userLogin = usernameField.getText();
+            char[] password = passwordField.getPassword();
+            char[] passwordConfirm = passwordConfirmField.getPassword();
+
+            if (userLogin.length() == 0) {
+                JOptionPane.showMessageDialog(null, "The username cannot be empty.");
+            }
+            else if (!Arrays.equals(password, passwordConfirm)) {
+                JOptionPane.showMessageDialog(null, "The passwords do not match.");
+            }
+            else if (DatabaseManager.hasUser(userLogin)) {
+                JOptionPane.showMessageDialog(null, "The specified username already exists.");
+            }
+            else {
+                try {
+                    String salt = generateSalt();
+                    KeySpec spec = new PBEKeySpec(password, salt.getBytes("US-ASCII"), 65536, 256);
+                    SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+                    byte[] hash = skf.generateSecret(spec).getEncoded();
+                    
+                    Arrays.fill(password, '\0');
+                    Arrays.fill(passwordConfirm, '\0');
+
+                    StringBuilder userHash = new StringBuilder(2 * hash.length);
+                    for (int i = 0; i < hash.length; i++) {
+                        String hex = Integer.toHexString(0xff & hash[i]);
+                        if (hex.length() == 1)
+                            userHash.append('0');
+                        userHash.append(hex);
+                    }
+
+                    DatabaseManager.addUser(userLogin, userHash.toString(), salt);
+                    
+                    JOptionPane.showMessageDialog(null, "The user was created.");
+                    cl.show(mainPanel, "login_panel");
+                } catch (Exception exc) {
+                    JOptionPane.showMessageDialog(null, "Failed to create a user.", "", JOptionPane.ERROR_MESSAGE);
+                }
+            }            
         }
     }
 }

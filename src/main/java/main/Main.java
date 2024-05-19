@@ -15,6 +15,7 @@ public class Main {
         SwingUtilities.invokeLater( () -> {
             mainFrame = new JFrame();
             mainFrame.setTitle("LearningApp");
+            mainFrame.setSize(762, 540);
             mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             
             mainPanel = new JPanel(new CardLayout());
@@ -22,7 +23,7 @@ public class Main {
             mainPanel.add("register_panel", new RegisterPanel(mainPanel));
 
             mainFrame.getContentPane().add(mainPanel);
-            mainFrame.pack(); 
+            //mainFrame.pack(); 
             mainFrame.setVisible(true);
         });
     }
