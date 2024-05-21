@@ -1,9 +1,9 @@
 package main;
 
-import javax.swing.*;
-
 import main.lib.DatabaseManager;
+import main.lib.User;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,9 +11,7 @@ import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
 
 import java.util.Arrays;
-import java.security.spec.*;
-import javax.crypto.spec.*;
-import javax.crypto.*;
+import java.util.Optional;
 
 public class LoginPanel extends JPanel implements ActionListener, ComponentListener {
 
@@ -82,41 +80,27 @@ public class LoginPanel extends JPanel implements ActionListener, ComponentListe
         
         if (e.getSource() == loginButton) {
             try {
-                // TODO: Refactor all the duplicated code around here (see RegisterPanel.java)
                 boolean loginSucceeded = false;
                 String userLogin = usernameField.getText();
+                Optional<User> user = DatabaseManager.getUser(userLogin);
 
-                if (DatabaseManager.hasUser(userLogin)) {
+                if (user.isPresent()) {
                     char password[] = passwordField.getPassword();
-                    String salt = DatabaseManager.getSalt(userLogin);
-                    String expectedHash = DatabaseManager.getHash(userLogin);
-
-                    KeySpec spec = new PBEKeySpec(password, salt.getBytes("US-ASCII"), 65536, 256);
-                    SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-                    byte[] hash = skf.generateSecret(spec).getEncoded();
-
-                    StringBuilder providedHash = new StringBuilder(2 * hash.length);
-                    for (int i = 0; i < hash.length; i++) {
-                        String hex = Integer.toHexString(0xff & hash[i]);
-                        if (hex.length() == 1)
-                            providedHash.append('0');
-                        providedHash.append(hex);
-                    }
-
+                    String providedHash = User.computeHash(password, user.get().getSalt());
+                    String expectedHash = user.get().getHash();
                     Arrays.fill(password, '\0');
 
-                    if (expectedHash.equals(providedHash.toString())) {
+                    if (expectedHash.equals(providedHash)) {
                         loginSucceeded = true;
                         usernameField.setText("");
                         passwordField.setText("");
-                        mainPanel.add("app_panel", new AppPanel(mainPanel, userLogin));
+                        mainPanel.add("app_panel", new AppPanel(mainPanel, user.get()));
                         mainPanel.revalidate();
                         cl.show(mainPanel, "app_panel");
                     }
                 }
-
                 if (!loginSucceeded) {
-                    JOptionPane.showMessageDialog(null, "Incorrec username or password.");
+                    JOptionPane.showMessageDialog(null, "Incorrect username or password.");
                 }
             } catch (Exception exc) {
                 JOptionPane.showMessageDialog(null, "An error occurred while authenticating the user.", "", JOptionPane.ERROR_MESSAGE);

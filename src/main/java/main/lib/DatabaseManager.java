@@ -3,6 +3,7 @@ package main.lib;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.function.Function;
+import java.util.Optional;
 
 /** The "static" class dealing with database connection. */
 public class DatabaseManager {
@@ -47,6 +48,21 @@ public class DatabaseManager {
         return selectQuery("SELECT * FROM categories", Category::new, Category[]::new);
     }
 
+    public static Optional<User> getUser(String login) {
+        String sql = "SELECT user_id, login, hash, salt FROM users WHERE login = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, login);
+            ResultSet result = statement.executeQuery();
+            if (result.next())
+                return Optional.of(new User(result));
+            else
+                return Optional.empty();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to retrieve user data: " + e);
+        }
+    }
+
     public static String getSalt(String login) {
         try {
             CallableStatement cs = connection.prepareCall("{? = CALL get_user(?)}");
@@ -56,19 +72,6 @@ public class DatabaseManager {
             return cs.getString(1);
         } catch (SQLException e) {
             throw new RuntimeException("Getting salt failed: " + e);
-        }
-    }
-
-    public static String getHash(String login) {
-        String sql = "SELECT hash FROM users WHERE login = ?";
-        try {
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, login);
-            ResultSet result = statement.executeQuery();
-            result.next();
-            return result.getString("hash");
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to add new user: " + e);
         }
     }
 

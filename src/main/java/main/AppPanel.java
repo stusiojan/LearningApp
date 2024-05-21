@@ -1,5 +1,7 @@
 package main;
 
+import main.lib.User;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -10,7 +12,7 @@ public class AppPanel extends JPanel implements ActionListener {
     private JPanel mainPanel;
     private JMenuItem userLogout;
 
-    public AppPanel(JPanel mainPanel, String userLogin)
+    public AppPanel(JPanel mainPanel, User user)
     {
         this.mainPanel = mainPanel;
 
@@ -18,8 +20,8 @@ public class AppPanel extends JPanel implements ActionListener {
         userLogout.addActionListener(this);
 
         JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Dashboard", new DashboardPanel(userLogin));
-        tabs.addTab("Categories", new CategoryPanel(userLogin));
+        tabs.addTab("Dashboard", new DashboardPanel(user));
+        tabs.addTab("Categories", new CategoryPanel(user));
 
         JMenu userMenu = new JMenu("User");
         userMenu.add(userLogout);

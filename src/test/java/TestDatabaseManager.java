@@ -40,8 +40,12 @@ public class TestDatabaseManager {
         Assert.assertFalse(DatabaseManager.hasUser(login));
 
         DatabaseManager.addUser(login, hash, salt);
+        User user = DatabaseManager.getUser(login).get();
         Assert.assertTrue(DatabaseManager.hasUser(login));
         Assert.assertEquals(salt, DatabaseManager.getSalt(login));
+        Assert.assertEquals(login, user.getLogin());
+        Assert.assertEquals(hash, user.getHash());
+        Assert.assertEquals(salt, user.getSalt());
 
         DatabaseManager.deleteUser(login);
         Assert.assertFalse(DatabaseManager.hasUser(login));

@@ -1,5 +1,8 @@
 package main;
 
+import main.lib.DatabaseManager;
+import main.lib.User;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -8,13 +11,7 @@ import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
 import javax.swing.plaf.basic.*;
 
-import main.lib.DatabaseManager;
-
 import java.util.Arrays;
-import java.security.SecureRandom;
-import java.security.spec.*;
-import javax.crypto.spec.*;
-import javax.crypto.*;
 
 public class RegisterPanel extends JPanel implements ActionListener, ComponentListener {
 
@@ -88,22 +85,6 @@ public class RegisterPanel extends JPanel implements ActionListener, ComponentLi
         addComponentListener(this);
     }
 
-    private String generateSalt() {
-        // FIXME: should probably be in a different class.
-        final int SALT_LENGTH = 16;
-        final String CHARSET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~";
-
-        SecureRandom sr = new SecureRandom();
-
-        String salt = "";
-        for (int i = 0; i < SALT_LENGTH; i++)
-        {   
-            int index = sr.nextInt(CHARSET.length());
-            salt += CHARSET.charAt(index);
-        }
-        return salt;
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
         CardLayout cl = (CardLayout)mainPanel.getLayout();
@@ -127,23 +108,12 @@ public class RegisterPanel extends JPanel implements ActionListener, ComponentLi
             }
             else {
                 try {
-                    String salt = generateSalt();
-                    KeySpec spec = new PBEKeySpec(password, salt.getBytes("US-ASCII"), 65536, 256);
-                    SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-                    byte[] hash = skf.generateSecret(spec).getEncoded();
-                    
+                    String salt = User.generateSalt();
+                    String hash = User.computeHash(password, salt);
                     Arrays.fill(password, '\0');
                     Arrays.fill(passwordConfirm, '\0');
 
-                    StringBuilder userHash = new StringBuilder(2 * hash.length);
-                    for (int i = 0; i < hash.length; i++) {
-                        String hex = Integer.toHexString(0xff & hash[i]);
-                        if (hex.length() == 1)
-                            userHash.append('0');
-                        userHash.append(hex);
-                    }
-
-                    DatabaseManager.addUser(userLogin, userHash.toString(), salt);
+                    DatabaseManager.addUser(userLogin, hash, salt);
                     
                     JOptionPane.showMessageDialog(null, "The user was created.");
                     usernameField.setText("");
