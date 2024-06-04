@@ -1,3 +1,6 @@
+import java.sql.Date;
+import java.util.*;
+
 import org.junit.Assert;
 import org.junit.Test;
 import main.lib.*;
@@ -51,5 +54,35 @@ public class TestDatabaseManager {
         Assert.assertFalse(DatabaseManager.hasUser(login));
 
         DatabaseManager.disconnect();
+    }
+
+    @Test
+    public void testGetMilestones() {
+        DatabaseManager.connect(true);
+
+        Category category = DatabaseManager.getCategories()[1];
+        User user = DatabaseManager.getUser("user1").get();
+        Milestone[] milestones = DatabaseManager.getMilestones(category.getId(), user.getId());
+
+        Assert.assertEquals("Podstawy języka", milestones[0].getName());
+        Assert.assertEquals("Najważniejsze elementy języka", milestones[0].getDescription());
+        Assert.assertEquals(Date.valueOf("2024-2-2"), milestones[0].getDateAdded());
+        Assert.assertEquals("Programowanie obiektowe", milestones[1].getName());
+    }
+
+    @Test
+    public void testGetTasks() {
+        DatabaseManager.connect(true);
+
+        Category category = DatabaseManager.getCategories()[1];
+        User user = DatabaseManager.getUser("user1").get();
+        Milestone[] milestones = DatabaseManager.getMilestones(category.getId(), user.getId());
+        ArrayList<Task> tasks = new ArrayList<Task>();
+        Collections.addAll(tasks, DatabaseManager.getTasks(milestones[0].getId()));
+
+        tasks.removeIf(task -> !task.getName().equals("Typy danych"));
+        Assert.assertEquals(1, tasks.size());
+        Assert.assertEquals(Date.valueOf("2024-02-04"), tasks.get(0).getDateCompleted());
+        Assert.assertEquals("Ciągi znaków, liczby całkowite i zmiennoprzecinkowe", tasks.get(0).getDescription());
     }
 }
