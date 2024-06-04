@@ -29,11 +29,10 @@ public class DatabaseManager {
         }
     }
 
-    private static <T> T[] selectQuery(String query, Function<ResultSet, T> function, Function<Integer, T[]> arrayMaker) {
+    private static <T> T[] selectQuery(PreparedStatement statement, Function<ResultSet, T> function, Function<Integer, T[]> arrayMaker) {
         ArrayList<T> list = new ArrayList<>();
         try {
-            Statement statement = connection.createStatement();
-            ResultSet result = statement.executeQuery(query);
+            ResultSet result = statement.executeQuery();
             while(result.next()) {
                 list.add(function.apply(result));
             }
@@ -42,6 +41,15 @@ public class DatabaseManager {
         }
         T[] array = arrayMaker.apply(list.size());
         return list.toArray(array);
+    }
+
+    private static <T> T[] selectQuery(String query, Function<ResultSet, T> function, Function<Integer, T[]> arrayMaker) {
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            return selectQuery(statement, function, arrayMaker);
+        } catch (SQLException e) {
+            throw new RuntimeException("Select query failed:" + e.getMessage());
+        }
     }
 
     public static Category[] getCategories() {
@@ -102,6 +110,29 @@ public class DatabaseManager {
             statement.close();
         }   catch (SQLException e) {
             throw new RuntimeException("Failed to delete user: " + e);
+        }
+    }
+
+    public static Milestone[] getMilestones(int categoryId, int userId) {
+        String sql = "SELECT * FROM milestones WHERE user_id = ? AND cat_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, userId);
+            statement.setInt(2, categoryId);
+            return selectQuery(statement, Milestone::new, Milestone[]::new);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to get milestones" + e);
+        }
+    }
+
+    public static Task[] getTasks(int milestoneId) {
+        String sql = "SELECT * FROM tasks WHERE mil_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, milestoneId);
+            return selectQuery(statement, Task::new, Task[]::new);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to get tasks" + e);
         }
     }
 }
