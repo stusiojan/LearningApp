@@ -12,6 +12,12 @@ public class Main {
     public static void main(String[] args) {
         DatabaseManager.connect();
 
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+
+        }
+
         SwingUtilities.invokeLater( () -> {
             mainFrame = new JFrame();
             mainFrame.setTitle("LearningApp");
