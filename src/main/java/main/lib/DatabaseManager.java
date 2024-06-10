@@ -2,8 +2,10 @@ package main.lib;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.function.Function;
 import java.util.Optional;
+import java.time.LocalDate;
 
 /** The "static" class dealing with database connection. */
 public class DatabaseManager {
@@ -49,6 +51,31 @@ public class DatabaseManager {
             return selectQuery(statement, function, arrayMaker);
         } catch (SQLException e) {
             throw new RuntimeException("Select query failed:" + e.getMessage());
+        }
+    }
+
+    private static <T> T selectById(String query, Function<ResultSet, T> function, int id) {
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, id);
+            ResultSet result = statement.executeQuery();
+            if (result.next())
+                return function.apply(result);
+            else
+                throw new SQLException("Failed to retrieve by id.");
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to retrieve: " + e);
+        }
+    }
+
+    private static void deleteById(String sql, int id) {
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, id);
+            statement.executeUpdate();
+            statement.close();
+        }  catch (SQLException e) {
+            throw new RuntimeException("Failed to delete: " + e);
         }
     }
 
@@ -134,5 +161,105 @@ public class DatabaseManager {
         } catch (SQLException e) {
             throw new RuntimeException("Failed to get tasks" + e);
         }
+    }
+
+    public static Category getCategory(int categoryId) {
+        return selectById("SELECT * FROM categories WHERE cat_id = ?", Category::new, categoryId);
+    }
+
+    public static Milestone getMilestone(int milestoneId) {
+        return selectById("SELECT * FROM milestones WHERE mil_id = ?", Milestone::new, milestoneId);
+    }
+
+    public static Task getTask(int taskId) {
+        return selectById("SELECT * FROM tasks WHERE task_id = ?", Task::new, taskId);
+    }
+
+    public static int addCategory(String categoryName) {
+        String sql = "INSERT INTO categories (cat_name, cat_description) VALUES (?, ?)";
+        try {
+            String returns[] = { "cat_id" };
+            PreparedStatement statement = connection.prepareStatement(sql, returns);
+            statement.setString(1, categoryName);
+            statement.setString(2, "");
+            statement.executeUpdate();
+            
+            int id;
+            ResultSet result = statement.getGeneratedKeys();
+            if (result.next())
+                id = result.getInt(1);
+            else
+                throw new SQLException("Failed to obtain category id.");
+            statement.close();
+            return id;
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to add new category: " + e);
+        }
+    }
+
+    public static int addMilestone(String milestoneName, int userId, int categoryId) {
+        Date dateAdded = Date.valueOf(LocalDate.now());
+        Date deadline = Date.valueOf(LocalDate.now().plusWeeks(1));
+
+        String sql = "INSERT INTO milestones (mil_name, date_added, deadline, mil_description, user_id, cat_id) VALUES (?, ?, ?, ?, ?, ?)";
+        try {
+            String returns[] = { "mil_id" };
+            PreparedStatement statement = connection.prepareStatement(sql, returns);
+            statement.setString(1, milestoneName);
+            statement.setDate(2, dateAdded);
+            statement.setDate(3, deadline);
+            statement.setString(4, "");      
+            statement.setInt(5, userId);
+            statement.setInt(6, categoryId);     
+            statement.executeUpdate();
+
+            int id;
+            ResultSet result = statement.getGeneratedKeys();
+            if (result.next())
+                id = result.getInt(1);
+            else
+                throw new SQLException("Failed to obtain category id.");
+            statement.close();
+            return id;
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to add new milestone: " + e);
+        }
+    }
+
+    public static int addTask(String taskName, int milestoneId) {
+        String sql = "INSERT INTO tasks (task_name, task_description, mil_id) VALUES (?, ?, ?)";
+        try {
+            String returns[] = { "task_id" };
+            PreparedStatement statement = connection.prepareStatement(sql, returns);
+            statement.setString(1, taskName);
+            statement.setString(2, "");
+            statement.setInt(3, milestoneId);
+            statement.executeUpdate();
+            
+            // FIXME: code duplication.
+            int id;
+            ResultSet result = statement.getGeneratedKeys();
+            if (result.next()) {
+                id = result.getInt(1);
+            } else {
+                throw new SQLException("Failed to obtain category id.");
+            }
+            statement.close();
+            return id;
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to add new task: " + e);
+        }
+    }
+
+    public static void deleteCategory(int categoryId) {
+        deleteById("DELETE FROM categories WHERE cat_id = ?", categoryId);
+    }
+
+    public static void deleteMilestone(int milestoneId) {
+        deleteById("DELETE FROM milestones WHERE mil_id = ?", milestoneId);
+    }
+
+    public static void deleteTask(int taskId) {
+        deleteById("DELETE FROM tasks WHERE task_id = ?",taskId);
     }
 }
