@@ -175,6 +175,7 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
         }
         public void reload() {
             category = DatabaseManager.getCategory(category.getId());
+            ((DataNode)getParent()).reload();
         }
         public DataNode addChild(User user, String name) {
             int id = DatabaseManager.addMilestone(name, user.getId(), category.getId());
@@ -201,6 +202,7 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
         }
         public void reload() {
             milestone = DatabaseManager.getMilestone(milestone.getId());
+            ((DataNode)getParent()).reload();
         }
         public DataNode addChild(User user, String name) {
             int id = DatabaseManager.addTask(name, milestone.getId());
@@ -227,6 +229,7 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
         }
         public void reload() {
             task = DatabaseManager.getTask(task.getId());
+            ((DataNode)getParent()).reload();
         }
         public DataNode addChild(User user, String name) { return null; }
 
