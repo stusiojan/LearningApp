@@ -264,9 +264,10 @@ public class DatabaseManager {
         deleteById("DELETE FROM tasks WHERE task_id = ?",taskId);
     }
 
-    public List<Task> fetchOverdueTasks(int userId) throws SQLException {
+    public static List<String> fetchOverdueTasks(int userId) throws SQLException {
         return getTasks(
-                "SELECT * FROM tasks t " +
+                "SELECT 'C' || m.cat_id || 'M' || m.mil_id || '#' || t.task_id || ' - ' || t.task_name " +
+                        "FROM tasks t " +
                         "JOIN milestones m ON t.mil_id = m.mil_id " +
                         "WHERE t.task_completed IS NULL " +
                         "AND m.deadline < SYSDATE " +
@@ -275,25 +276,69 @@ public class DatabaseManager {
         );
     }
 
-    public List<Task> getTasksForWeek(int userId) throws SQLException {
+    public static List<String> fetchTasksForWeek(int userId) throws SQLException {
         return getTasks(
-                "SELECT * FROM tasks WHERE user_id = ? AND due_date BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '7' DAY",
+                "SELECT 'C' || m.cat_id || 'M' || m.mil_id || '#' || t.task_id || ' - ' || t.task_name " +
+                        "FROM tasks t " +
+                        "JOIN milestones m ON t.mil_id = m.mil_id " +
+                        "WHERE t.task_completed IS NULL " +
+                        "AND m.deadline BETWEEN TRUNC(SYSDATE, 'IW') AND TRUNC(SYSDATE, 'IW') + 6 " +
+                        "AND m.user_id = ?",
                 userId
         );
     }
 
-    public List<Task> getTasksForMonth(int userId) throws SQLException {
-        return getTasks("SELECT * FROM tasks WHERE user_id = ? AND due_date BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '1' MONTH", userId);
+    public static List<String> fetchTasksForMonth(int userId) throws SQLException {
+        return getTasks(
+                "SELECT 'C' || m.cat_id || 'M' || m.mil_id || '#' || t.task_id || ' - ' || t.task_name " +
+                        "FROM tasks t " +
+                        "JOIN milestones m ON t.mil_id = m.mil_id " +
+                        "WHERE t.task_completed IS NULL " +
+                        "AND m.deadline BETWEEN TRUNC(SYSDATE, 'WW') AND TRUNC(SYSDATE, 'WW') + INTERVAL '1' MONTH " +
+                        "AND m.user_id = ?",
+                userId
+        );
     }
 
-    private List<Task> getTasks(String query, int userId) throws SQLException {
-        List<Task> tasks = new ArrayList<>();
+    public static List<String> fetchAllTasks(int userId) throws SQLException {
+        return getTasks(
+                "SELECT 'C' || m.cat_id || 'M' || m.mil_id || '#' || t.task_id || ' - ' || t.task_name " +
+                        "FROM tasks t " +
+                        "JOIN milestones m ON t.mil_id = m.mil_id " +
+                        "WHERE t.task_completed IS NULL " +
+                        "AND m.user_id = ?",
+                userId
+        );
+    }
+
+    public Task fetchTaskByName(int userId, String taskName) throws SQLException {
+        String query = "SELECT * FROM tasks t " +
+                "JOIN milestones m ON t.mil_id = m.mil_id " +
+                "WHERE t.task_name = ? " +
+                "AND m.user_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, taskName);
+            statement.setInt(2, userId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return new Task(resultSet);
+            } else {
+                throw new SQLException("Failed to get task by name.");
+            }
+        } catch (SQLException e) {
+            throw new SQLException("Failed to get task by name: " + e.getMessage());
+        }
+    }
+
+    private static List<String> getTasks(String query, int userId) throws SQLException {
+        List<String> tasks = new ArrayList<>();
         try {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, userId);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                tasks.add(new Task(resultSet));
+                tasks.add(resultSet.getString(1));
             }
         } catch (SQLException e) {
             throw new SQLException("Failed to get list of tasks: " + e.getMessage());

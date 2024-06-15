@@ -10,152 +10,112 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class DashboardPanel extends JPanel implements ActionListener {
     private final User user;
-    private final DatabaseManager dbManager;
-    private Calendar calendar;
-    private DefaultListModel<String> taskListModel;
-    private JCheckBox overdueCheckBox;
-    private JCheckBox weekCheckBox;
-    private JCheckBox monthCheckBox;
+    private final Calendar calendar;
+    private final DefaultListModel<String> taskListModel;
+    private final JComboBox<String> selectBox;
+    private final JList<String> taskList;
 
     public DashboardPanel(User user) throws SQLException {
         this.user = user;
-        this.dbManager = new DatabaseManager();
-        taskListModel = new DefaultListModel<>();
+        this.calendar = new Calendar();
+        this.taskListModel = new DefaultListModel<>();
+        String[] selectBoxLabels = {"All Tasks", "Overdue Tasks", "Tasks for the Week", "Tasks for the Month"};
+        this.selectBox = new JComboBox<>(selectBoxLabels);
+        this.taskList = new JList<>(taskListModel);
+
         initializeUI();
         updateCalendarAndTasks();
     }
+
     private void initializeUI() {
         setLayout(new BorderLayout());
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        selectBox.setSelectedIndex(0);
+        selectBox.addActionListener(this);
+
+        taskList.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    int index = taskList.locationToIndex(evt.getPoint());
+                    if (index >= 0) {
+                        String selectedTaskName = taskListModel.getElementAt(index);
+                        showTaskDetails(selectedTaskName);
+                    }
+                }
+            }
+        });
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createCalendarPanel(), createTaskListPanel());
         splitPane.setDividerLocation(400);
-
-        // Left panel: Calendar
-        Calendar calendar = new Calendar();
-        calendar.setCurrentView(CalendarView.SingleMonth);
-        splitPane.setLeftComponent(calendar);
-
-        // Right panel: Task list view
-        JPanel taskListPanel = new JPanel();
-        taskListPanel.setLayout(new BorderLayout());
-
-        // Top part: List of tasks
-        JList<String> taskList = new JList<>(taskListModel);
-        JScrollPane taskListScrollPane = new JScrollPane(taskList);
-        taskListPanel.add(taskListScrollPane, BorderLayout.CENTER);
-
-        // Bottom part: Filter options
-        JPanel filterPanel = new JPanel();
-        filterPanel.setLayout(new FlowLayout());
-
-        JCheckBox overdueCheckBox = new JCheckBox("Overdue Tasks");
-        JCheckBox weekCheckBox = new JCheckBox("Tasks for the Week");
-        JCheckBox monthCheckBox = new JCheckBox("Tasks for the Month");
-
-        // set overdueCheckBox to selected
-        overdueCheckBox.setSelected(true);
-
-        filterPanel.add(overdueCheckBox);
-        filterPanel.add(weekCheckBox);
-        filterPanel.add(monthCheckBox);
-
-        taskListPanel.add(filterPanel, BorderLayout.SOUTH);
-
-        splitPane.setRightComponent(taskListPanel);
-
         add(splitPane, BorderLayout.CENTER);
     }
-    private void updateCalendarAndTasks() throws SQLException {
-        // Get current date
 
-        // Populate calendar
-//        List<Task> monthlyTasks = dbManager.fetchTasksByMonth(
-//                currentDate.getMonth() + 1,
-//                currentDate.getYear() + 1900
-//        );
-//        populateCalendar(monthlyTasks);
-
-        // Populate task list based on filter options
-//        if (overdueCheckBox.isSelected()) {
-            List<Task> overdueTasks = dbManager.fetchOverdueTasks(this.user.getId());
-            populateTaskList(overdueTasks);
-//        }
-//        else if (weekCheckBox.isSelected()) {
-//            Date startOfWeek = getStartOfWeek(currentDate);
-//            Date endOfWeek = getEndOfWeek(currentDate);
-//            List<Task> weeklyTasks = dbManager.fetchTasksForWeek(startOfWeek, endOfWeek);
-//            populateTaskList(weeklyTasks);
-//        } else if (monthCheckBox.isSelected()) {
-//            Date startOfMonth = getStartOfMonth(currentDate);
-//            Date endOfMonth = getEndOfMonth(currentDate);
-//            List<Task> monthlyTasksForList = dbManager.fetchTasksForMonth(startOfMonth, endOfMonth);
-//            populateTaskList(monthlyTasksForList);
-//        } else {
-//            List<Task> allTasks = new ArrayList<>();
-//            populateTaskList(allTasks);
-//        }
+    private JPanel createCalendarPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        calendar.setCurrentView(CalendarView.SingleMonth);
+        panel.add(calendar, BorderLayout.CENTER);
+        return panel;
     }
-//
-//    private void populateCalendar(List<Task> tasks) {
-//        calendar.getSchedule().getItems().clear();
-//        for (Task task : tasks) {
-//            com.mindfusion.scheduling.model.Appointment appointment = new com.mindfusion.scheduling.model.Appointment();
-//            appointment.setStartTime(new com.mindfusion.common.DateTime(task.getDateCompleted()));
-//            appointment.setEndTime(new com.mindfusion.common.DateTime(task.getDateCompleted()).addMinutes(30));
-//            appointment.setHeaderText(task.getName());
-//            calendar.getSchedule().getItems().add(appointment);
-//        }
-//    }
-//
-    private void populateTaskList(List<Task> tasks) {
+
+    private JPanel createTaskListPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(new JScrollPane(taskList), BorderLayout.CENTER);
+        panel.add(createFilterPanel(), BorderLayout.SOUTH);
+        return panel;
+    }
+
+    private JPanel createFilterPanel() {
+        JPanel panel = new JPanel(new FlowLayout());
+        panel.add(selectBox);
+        return panel;
+    }
+
+    private void updateCalendarAndTasks() throws SQLException {
+        List<String> tasks = switch (selectBox.getSelectedIndex()) {
+            case 1 -> DatabaseManager.fetchOverdueTasks(user.getId());
+            case 2 -> DatabaseManager.fetchTasksForWeek(user.getId());
+            case 3 -> DatabaseManager.fetchTasksForMonth(user.getId());
+            default -> DatabaseManager.fetchAllTasks(user.getId());
+        };
+
+        populateTaskList(tasks);
+        // populateCalendar(tasks); // Uncomment if calendar functionality is needed
+    }
+
+    private void populateTaskList(List<String> tasks) {
         taskListModel.clear();
-        for (Task task : tasks) {
-            taskListModel.addElement(task.getName());
+        for (String taskLabel : tasks) {
+            taskListModel.addElement(taskLabel);
         }
     }
-//
-//    private Date getStartOfWeek(Date date) {
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTime(date);
-//        calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
-//        return calendar.getTime();
-//    }
-//
-//    private Date getEndOfWeek(Date date) {
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTime(date);
-//        calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
-//        calendar.add(Calendar.DAY_OF_WEEK, 6);
-//        return calendar.getTime();
-//    }
-//
-//    private Date getStartOfMonth(Date date) {
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTime(date);
-//        calendar.set(Calendar.DAY_OF_MONTH, 1);
-//        return calendar.getTime();
-//    }
-//
-//    private Date getEndOfMonth(Date date) {
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTime(date);
-//        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-//        return calendar.getTime();
-//    }
+
+    private void showTaskDetails(String taskLabel) {
+        String taskId = taskLabel.split("#")[1].split(" - ")[0];
+        Task task = DatabaseManager.getTask(Integer.parseInt(taskId));
+        if (task != null) {
+            TaskDetailsDialog dialog = new TaskDetailsDialog(task, this::refreshData);
+            dialog.setLocationRelativeTo(this);
+            dialog.setVisible(true);
+        }
+    }
+
+    private void refreshData() {
+        try {
+            updateCalendarAndTasks();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        try {
-            updateCalendarAndTasks();
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
-        }
+        refreshData();
     }
 }
