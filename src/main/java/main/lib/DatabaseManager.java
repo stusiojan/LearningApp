@@ -3,6 +3,7 @@ package main.lib;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.function.Function;
 import java.util.Optional;
 import java.time.LocalDate;
@@ -178,7 +179,7 @@ public class DatabaseManager {
     public static int addCategory(String categoryName) {
         String sql = "INSERT INTO categories (cat_name, cat_description) VALUES (?, ?)";
         try {
-            String returns[] = { "cat_id" };
+            String[] returns = { "cat_id" };
             PreparedStatement statement = connection.prepareStatement(sql, returns);
             statement.setString(1, categoryName);
             statement.setString(2, "");
@@ -203,7 +204,7 @@ public class DatabaseManager {
 
         String sql = "INSERT INTO milestones (mil_name, date_added, deadline, mil_description, user_id, cat_id) VALUES (?, ?, ?, ?, ?, ?)";
         try {
-            String returns[] = { "mil_id" };
+            String[] returns = { "mil_id" };
             PreparedStatement statement = connection.prepareStatement(sql, returns);
             statement.setString(1, milestoneName);
             statement.setDate(2, dateAdded);
@@ -229,7 +230,7 @@ public class DatabaseManager {
     public static int addTask(String taskName, int milestoneId) {
         String sql = "INSERT INTO tasks (task_name, task_description, mil_id) VALUES (?, ?, ?)";
         try {
-            String returns[] = { "task_id" };
+            String[] returns = { "task_id" };
             PreparedStatement statement = connection.prepareStatement(sql, returns);
             statement.setString(1, taskName);
             statement.setString(2, "");
@@ -261,5 +262,42 @@ public class DatabaseManager {
 
     public static void deleteTask(int taskId) {
         deleteById("DELETE FROM tasks WHERE task_id = ?",taskId);
+    }
+
+    public List<Task> fetchOverdueTasks(int userId) throws SQLException {
+        return getTasks(
+                "SELECT * FROM tasks t " +
+                        "JOIN milestones m ON t.mil_id = m.mil_id " +
+                        "WHERE t.task_completed IS NULL " +
+                        "AND m.deadline < SYSDATE " +
+                        "AND m.user_id = ?",
+                userId
+        );
+    }
+
+    public List<Task> getTasksForWeek(int userId) throws SQLException {
+        return getTasks(
+                "SELECT * FROM tasks WHERE user_id = ? AND due_date BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '7' DAY",
+                userId
+        );
+    }
+
+    public List<Task> getTasksForMonth(int userId) throws SQLException {
+        return getTasks("SELECT * FROM tasks WHERE user_id = ? AND due_date BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '1' MONTH", userId);
+    }
+
+    private List<Task> getTasks(String query, int userId) throws SQLException {
+        List<Task> tasks = new ArrayList<>();
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, userId);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                tasks.add(new Task(resultSet));
+            }
+        } catch (SQLException e) {
+            throw new SQLException("Failed to get list of tasks: " + e.getMessage());
+        }
+        return tasks;
     }
 }
