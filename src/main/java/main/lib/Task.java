@@ -23,6 +23,14 @@ public class Task {
         }
     }
 
+    public Task(int id, String name, Date dateCompleted, String description, int milestoneId) {
+        this.id = id;
+        this.name = name;
+        this.dateCompleted = dateCompleted;
+        this.description = description;
+        this.milestoneId = milestoneId;
+    }
+
     public int getId() {
         return id;
     }

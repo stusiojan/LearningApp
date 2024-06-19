@@ -311,26 +311,6 @@ public class DatabaseManager {
         );
     }
 
-    public Task fetchTaskByName(int userId, String taskName) throws SQLException {
-        String query = "SELECT * FROM tasks t " +
-                "JOIN milestones m ON t.mil_id = m.mil_id " +
-                "WHERE t.task_name = ? " +
-                "AND m.user_id = ?";
-        try {
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setString(1, taskName);
-            statement.setInt(2, userId);
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                return new Task(resultSet);
-            } else {
-                throw new SQLException("Failed to get task by name.");
-            }
-        } catch (SQLException e) {
-            throw new SQLException("Failed to get task by name: " + e.getMessage());
-        }
-    }
-
     private static List<String> getTasks(String query, int userId) throws SQLException {
         List<String> tasks = new ArrayList<>();
         try {
@@ -345,4 +325,21 @@ public class DatabaseManager {
         }
         return tasks;
     }
+
+    public static void updateTask(Task task) {
+        String sql = "UPDATE tasks SET task_name = ?, task_description = ?, task_completed = ? WHERE task_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, task.getName());
+            statement.setString(2, task.getDescription());
+            statement.setDate(3, task.getDateCompleted());
+            statement.setInt(4, task.getId());
+            statement.executeUpdate();
+            statement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to update task: " + e);
+        }
+    }
 }
+
+
