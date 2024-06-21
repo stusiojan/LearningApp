@@ -141,6 +141,22 @@ public class DatabaseManager {
         }
     }
 
+    public static List<Milestone> getMilestones(int userId) {
+        String sql = "SELECT * FROM milestones WHERE user_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, userId);
+            ResultSet result = statement.executeQuery();
+            List<Milestone> milestones = new ArrayList<>();
+            while (result.next()) {
+                milestones.add(new Milestone(result));
+            }
+            return milestones;
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to get milestones: " + e);
+        }
+    }
+
     public static Milestone[] getMilestones(int categoryId, int userId) {
         String sql = "SELECT * FROM milestones WHERE user_id = ? AND cat_id = ?";
         try {
@@ -338,6 +354,25 @@ public class DatabaseManager {
             statement.close();
         } catch (SQLException e) {
             throw new RuntimeException("Failed to update task: " + e);
+        }
+    }
+
+    public static void updateMilestone(Milestone milestone) {
+        String sql = "UPDATE milestones SET mil_name = ?, date_added = ?, deadline = ?, mil_description = ?, mil_completed = ?, mil_tasks_all = ?, mil_tasks_done = ? WHERE mil_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, milestone.getName());
+            statement.setDate(2, milestone.getDateAdded());
+            statement.setDate(3, milestone.getDeadline());
+            statement.setString(4, milestone.getDescription());
+            statement.setDate(5, milestone.getDateCompleted());
+            statement.setInt(6, milestone.getTasksAll());
+            statement.setInt(7, milestone.getTasksDone());
+            statement.setInt(8, milestone.getId());
+            statement.executeUpdate();
+            statement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to update milestone: " + e);
         }
     }
 }

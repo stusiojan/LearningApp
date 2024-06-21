@@ -1,8 +1,13 @@
 package main;
 
+import com.mindfusion.common.DateTime;
 import com.mindfusion.scheduling.Calendar;
+import com.mindfusion.scheduling.CalendarAdapter;
 import com.mindfusion.scheduling.CalendarView;
+import com.mindfusion.scheduling.ItemMouseEvent;
+import com.mindfusion.scheduling.model.Appointment;
 import main.lib.DatabaseManager;
+import main.lib.Milestone;
 import main.lib.Task;
 import main.lib.User;
 
@@ -12,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -21,7 +27,6 @@ public class DashboardPanel extends JPanel implements ActionListener {
     private final DefaultListModel<String> taskListModel;
     private final JComboBox<String> selectBox;
     private final JList<String> taskList;
-
     public DashboardPanel(User user) throws SQLException {
         this.user = user;
         this.calendar = new Calendar();
@@ -52,6 +57,21 @@ public class DashboardPanel extends JPanel implements ActionListener {
             }
         });
 
+        calendar.addCalendarListener(new CalendarAdapter() {
+            @Override
+            public void itemClick(ItemMouseEvent e) {
+                Appointment item = (Appointment) e.getItem();
+                String milestoneId = item.getHeaderText().split("-")[0].substring(1);
+                Milestone milestone = DatabaseManager.getMilestone(Integer.parseInt(milestoneId));
+                if (milestone != null) {
+                    System.out.println(milestone.getName());
+                    MilestoneDetailsDialog dialog = new MilestoneDetailsDialog(milestone, DashboardPanel.this::refreshData);
+                    dialog.setLocationRelativeTo(DashboardPanel.this);
+                    dialog.setVisible(true);
+                }
+            }
+        });
+
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createCalendarPanel(), createTaskListPanel());
         splitPane.setDividerLocation(400);
         add(splitPane, BorderLayout.CENTER);
@@ -60,6 +80,9 @@ public class DashboardPanel extends JPanel implements ActionListener {
     private JPanel createCalendarPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         calendar.setCurrentView(CalendarView.SingleMonth);
+        calendar.setAllowInplaceEdit(false);
+        calendar.setAllowInplaceCreate(false);
+        calendar.setAllowDrag(false);
         panel.add(calendar, BorderLayout.CENTER);
         return panel;
     }
@@ -86,7 +109,9 @@ public class DashboardPanel extends JPanel implements ActionListener {
         };
 
         populateTaskList(tasks);
-        // populateCalendar(tasks); // Uncomment if calendar functionality is needed
+
+        List<Milestone> milestones = DatabaseManager.getMilestones(user.getId());
+        populateCalendar(milestones);
     }
 
     private void populateTaskList(List<String> tasks) {
@@ -94,6 +119,27 @@ public class DashboardPanel extends JPanel implements ActionListener {
         for (String taskLabel : tasks) {
             taskListModel.addElement(taskLabel);
         }
+    }
+
+    private void populateCalendar(List<Milestone> milestones) {
+        calendar.getSchedule().getItems().clear();
+        for (Milestone milestone : milestones) {
+            Appointment appointment = new Appointment();
+            DateTime startDate = new DateTime(
+                    new java.util.Date(milestone.getDateAdded().getTime())
+            );
+            DateTime endDate = new DateTime(
+                    new java.util.Date(milestone.getDeadline().getTime())
+            );
+            appointment.setStartTime(startDate);
+            appointment.setEndTime(endDate);
+            appointment.setHeaderText("#" + milestone.getId() + "-" + milestone.getName());
+            appointment.setAllowMove(false);
+            calendar.getSchedule().getItems().add(appointment);
+        }
+        // Refresh the calendar to make sure the new appointments are displayed
+        calendar.invalidate();
+        calendar.repaint();
     }
 
     private void showTaskDetails(String taskLabel) {

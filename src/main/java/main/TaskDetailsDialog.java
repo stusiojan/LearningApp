@@ -1,15 +1,12 @@
 package main;
 
-import main.lib.Category;
-import main.lib.DatabaseManager;
-import main.lib.Milestone;
-import main.lib.Task;
+import main.lib.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Date;
 
-public class TaskDetailsDialog extends JDialog {
+public class TaskDetailsDialog extends DetailsDialog {
     private final Task task;
     private final Runnable refreshCallback;
     private final JTextField categoryLabelField;
@@ -19,11 +16,6 @@ public class TaskDetailsDialog extends JDialog {
     private final JTextArea taskDescriptionField;
     private final JTextField dateCompletedField;
     private final JCheckBox completeCheckBox;
-    private final JButton deleteTaskButton;
-    private final JButton editButton;
-    private final JButton closeButton;
-    private Boolean editMode = false;
-
     public TaskDetailsDialog(Task task, Runnable refreshCallback) {
         this.task = task;
         this.refreshCallback = refreshCallback;
@@ -48,18 +40,11 @@ public class TaskDetailsDialog extends JDialog {
         completeCheckBox = new JCheckBox("Complete");
         completeCheckBox.setSelected(task.getDateCompleted() != null);
 
-        deleteTaskButton = new JButton("Delete");
-        editButton = new JButton("Edit");
-        closeButton = new JButton("Close");
-
-        initializeUI();
+        contentLayout();
+        buttonLayout();
     }
 
-    private void initializeUI() {
-        deleteTaskButton.addActionListener(e -> deleteTask());
-        editButton.addActionListener(e -> changeEditMode());
-        closeButton.addActionListener(e -> cancelAction());
-
+    private void contentLayout() {
         JPanel categoryPanel = new JPanel(new GridLayout(1, 2));
         categoryPanel.add(new JLabel("Category:"));
         categoryPanel.add(categoryLabelField);
@@ -86,13 +71,7 @@ public class TaskDetailsDialog extends JDialog {
         detailsPanel.add(new JLabel("Mark as Complete:"));
         detailsPanel.add(completeCheckBox);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(deleteTaskButton);
-        buttonPanel.add(editButton);
-        buttonPanel.add(closeButton);
-
         add(new JScrollPane(detailsPanel), BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
         disableEditing();
     }
 
@@ -118,7 +97,28 @@ public class TaskDetailsDialog extends JDialog {
         completeCheckBox.setEnabled(false);
     }
 
-    private void changeEditMode() {
+    private void reverseChanges() {
+        taskNameField.setText(task.getName());
+        taskDescriptionField.setText(task.getDescription());
+        completeCheckBox.setSelected(task.getDateCompleted() != null);
+    }
+
+    private void saveTaskDetails() {
+        Task task;
+        task = new Task(
+                this.task.getId(),
+                taskNameField.getText(),
+                completeCheckBox.isSelected() ? new Date(System.currentTimeMillis()) : null,
+                taskDescriptionField.getText(),
+                this.task.getMilestoneId()
+        );
+
+        DatabaseManager.updateTask(task);
+        refreshCallback.run();
+    }
+
+    @Override
+    protected void editAction() {
         if (editMode) {
             editMode = false;
             editButton.setText("Edit");
@@ -137,7 +137,8 @@ public class TaskDetailsDialog extends JDialog {
         completeCheckBox.setEnabled(true);
     }
 
-    private void cancelAction() {
+    @Override
+    protected void closeAction() {
         if (editMode) {
             editMode = false;
             editButton.setText("Edit");
@@ -149,26 +150,8 @@ public class TaskDetailsDialog extends JDialog {
         dispose();
     }
 
-    private void reverseChanges() {
-        taskNameField.setText(task.getName());
-        taskDescriptionField.setText(task.getDescription());
-        completeCheckBox.setSelected(task.getDateCompleted() != null);
-    }
-
-    private void saveTaskDetails() {
-        Task task = new Task(
-                this.task.getId(),
-                taskNameField.getText(),
-                completeCheckBox.isSelected() ? new Date(System.currentTimeMillis()) : null,
-                taskDescriptionField.getText(),
-                this.task.getMilestoneId()
-        );
-
-        DatabaseManager.updateTask(task);
-        refreshCallback.run();
-    }
-
-    private void deleteTask() {
+    @Override
+    protected void deleteAction() {
         DatabaseManager.deleteTask(task.getId());
         refreshCallback.run();
         dispose();

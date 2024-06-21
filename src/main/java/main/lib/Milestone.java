@@ -33,6 +33,19 @@ public class Milestone {
         }
     }
 
+    public Milestone(int id, String name, Date dateAdded, Date deadline, Date dateCompleted, String description, int tasksAll, int tasksDone, int userId, int categoryId) {
+        this.id = id;
+        this.name = name;
+        this.dateAdded = dateAdded;
+        this.deadline = deadline;
+        this.dateCompleted = dateCompleted;
+        this.description = description;
+        this.tasksAll = tasksAll;
+        this.tasksDone = tasksDone;
+        this.userId = userId;
+        this.categoryId = categoryId;
+    }
+
     public int getId() {
         return id;
     }
