@@ -144,16 +144,12 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
         categoryTree = new JTree(root);
         categoryTree.setRowHeight(categoryTree.getRowHeight() + 4);
         JScrollPane treePane = new JScrollPane(categoryTree);
-
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        add(controls);
-        add(treePane);
-        add(Box.createRigidArea(new Dimension(0,20)));
+        setLayout(new BorderLayout());
+        add(controls, BorderLayout.PAGE_START);
+        add(treePane, BorderLayout.CENTER);
 
         categoryTree.addTreeSelectionListener(this);
         categoryTree.setCellRenderer(categoryTreeRenderer);
-
-        //categoryTreeRenderer.setFont(categoryTree.getFont().deriveFont(32.0f));
 
         var thisPanel = this;
         categoryTree.addMouseListener(new MouseAdapter() {
