@@ -109,7 +109,7 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
         }
     }
 
-    private void rebuildUI() {
+    public void rebuildUI() {
         removeAll();
         JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEADING));
         controls.add(nodeNameField);
