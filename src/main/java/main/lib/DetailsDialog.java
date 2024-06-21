@@ -23,6 +23,7 @@ public abstract class DetailsDialog extends JDialog {
         closeButton.addActionListener(e -> closeAction());
 
         buttonLayout();
+        pack();
     }
 
     protected void buttonLayout() {

@@ -9,7 +9,6 @@ import java.sql.Date;
 public class MilestoneDetailsDialog extends DetailsDialog {
     private final Milestone milestone;
     private final Runnable refreshCallback;
-    private final JTextField categoryLabelField;
     private final JTextField milestoneNameField;
     private final JTextArea milestoneDescriptionField;
     private final JTextField milestoneDateAddedField;
@@ -20,11 +19,7 @@ public class MilestoneDetailsDialog extends DetailsDialog {
         this.refreshCallback = refreshCallback;
 
         setTitle("Milestone Details");
-        setSize(400, 300);
-        setLayout(new BorderLayout());
 
-        Category category = DatabaseManager.getCategory(milestone.getCategoryId());
-        categoryLabelField = new JTextField("#" + category.getId() + " " + category.getName());
 
         milestoneNameField = new JTextField(milestone.getName());
         milestoneDescriptionField = new JTextArea(milestone.getDescription());
@@ -35,15 +30,20 @@ public class MilestoneDetailsDialog extends DetailsDialog {
         milestoneDeadlineField = new JTextField(String.valueOf(milestone.getDeadline()));
 
         contentLayout();
-        buttonLayout();
+        pack();
     }
 
     private void contentLayout() {
-        JPanel detailsPanel = new JPanel(new GridLayout(5, 2));
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        detailsPanel.add(new JLabel("Category:"));
-        detailsPanel.add(categoryLabelField);
+        Category category = DatabaseManager.getCategory(milestone.getCategoryId());
+        contentPanel.add(
+                new JLabel("<html><b>Category: #" + category.getId() + " " + category.getName() + "</b></html>"),
+                BorderLayout.NORTH
+        );
 
+        JPanel detailsPanel = new JPanel(new GridLayout(5, 2, 20, 20));
         detailsPanel.add(new JLabel("Milestone Name:"));
         detailsPanel.add(milestoneNameField);
         detailsPanel.add(new JLabel("Milestone Description:"));
@@ -72,14 +72,13 @@ public class MilestoneDetailsDialog extends DetailsDialog {
         progressBar.setStringPainted(true);
         detailsPanel.add(progressBar);
 
-        add(new JScrollPane(detailsPanel), BorderLayout.CENTER);
+        contentPanel.add(detailsPanel, BorderLayout.CENTER);
+
+        add(new JScrollPane(contentPanel), BorderLayout.CENTER);
         disableEditing();
     }
 
     private void disableEditing() {
-        categoryLabelField.setEditable(false);
-        categoryLabelField.setBackground(Color.GRAY);
-
         milestoneNameField.setEditable(false);
         milestoneNameField.setBackground(Color.GRAY);
 
@@ -110,6 +109,8 @@ public class MilestoneDetailsDialog extends DetailsDialog {
         milestoneNameField.setBackground(Color.WHITE);
         milestoneDescriptionField.setEditable(true);
         milestoneDescriptionField.setBackground(Color.WHITE);
+        milestoneDateAddedField.setEditable(true);
+        milestoneDateAddedField.setBackground(Color.WHITE);
         milestoneDeadlineField.setEditable(true);
         milestoneDeadlineField.setBackground(Color.WHITE);
     }

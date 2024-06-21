@@ -9,9 +9,6 @@ import java.sql.Date;
 public class TaskDetailsDialog extends DetailsDialog {
     private final Task task;
     private final Runnable refreshCallback;
-    private final JTextField categoryLabelField;
-    private final JTextField milestoneLabelField;
-    private final JTextField milestoneDeadlineField;
     private final JTextField taskNameField;
     private final JTextArea taskDescriptionField;
     private final JTextField dateCompletedField;
@@ -21,19 +18,12 @@ public class TaskDetailsDialog extends DetailsDialog {
         this.refreshCallback = refreshCallback;
 
         setTitle("Task Details");
-        setSize(400, 300);
-        setLayout(new BorderLayout());
-        Milestone milestone = DatabaseManager.getMilestone(task.getMilestoneId());
-        Category category = DatabaseManager.getCategory(milestone.getCategoryId());
 
         taskNameField = new JTextField(task.getName());
         taskDescriptionField = new JTextArea(task.getDescription());
         taskDescriptionField.setRows(5);
         taskDescriptionField.setLineWrap(true);
         taskDescriptionField.setWrapStyleWord(true);
-        milestoneLabelField = new JTextField("#" + milestone.getId() + " " + milestone.getName());
-        milestoneDeadlineField = new JTextField(String.valueOf(milestone.getDeadline()));
-        categoryLabelField = new JTextField("#" + category.getId() + " " + category.getName());
         dateCompletedField = new JTextField(String.valueOf(task.getDateCompleted()));
         dateCompletedField.setEditable(false);
 
@@ -41,20 +31,25 @@ public class TaskDetailsDialog extends DetailsDialog {
         completeCheckBox.setSelected(task.getDateCompleted() != null);
 
         contentLayout();
-        buttonLayout();
+        pack();
     }
 
     private void contentLayout() {
-        JPanel categoryPanel = new JPanel(new GridLayout(1, 2));
-        categoryPanel.add(new JLabel("Category:"));
-        categoryPanel.add(categoryLabelField);
-        JPanel milestonePanel = new JPanel(new GridLayout(1, 2));
-        milestonePanel.add(new JLabel("Milestone:"));
-        milestonePanel.add(milestoneLabelField);
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        JPanel detailsPanel = new JPanel(new GridLayout(5, 2));
-        detailsPanel.add(categoryPanel);
-        detailsPanel.add(milestonePanel);
+        JPanel headerPanel = new JPanel(new GridLayout(1, 2, 15, 15));
+        Milestone milestone = DatabaseManager.getMilestone(task.getMilestoneId());
+        Category category = DatabaseManager.getCategory(milestone.getCategoryId());
+        headerPanel.add(
+                new JLabel("<html><b>Category: #" + category.getId() + " " + category.getName() + "</b></html>")
+        );
+        headerPanel.add(
+                new JLabel("<html><b>Milestone: #" + milestone.getId() + " " + milestone.getName() + "</b></html>")
+        );
+        contentPanel.add(headerPanel, BorderLayout.NORTH);
+
+        JPanel detailsPanel = new JPanel(new GridLayout(5, 2, 15, 15));
         detailsPanel.add(new JLabel("Task Name:"));
         detailsPanel.add(taskNameField);
         detailsPanel.add(new JLabel("Task Description:"));
@@ -65,23 +60,19 @@ public class TaskDetailsDialog extends DetailsDialog {
 
         } else {
             detailsPanel.add(new JLabel("Milestone Deadline:"));
-            detailsPanel.add(milestoneDeadlineField);
+            detailsPanel.add(new JLabel(String.valueOf(milestone.getDeadline())));
         }
 
         detailsPanel.add(new JLabel("Mark as Complete:"));
         detailsPanel.add(completeCheckBox);
 
-        add(new JScrollPane(detailsPanel), BorderLayout.CENTER);
+        contentPanel.add(detailsPanel, BorderLayout.CENTER);
+
+        add(new JScrollPane(contentPanel), BorderLayout.CENTER);
         disableEditing();
     }
 
     private void disableEditing() {
-        categoryLabelField.setEditable(false);
-        categoryLabelField.setBackground(Color.GRAY);
-
-        milestoneLabelField.setEditable(false);
-        milestoneLabelField.setBackground(Color.GRAY);
-
         taskNameField.setEditable(false);
         taskNameField.setBackground(Color.GRAY);
 
@@ -90,9 +81,6 @@ public class TaskDetailsDialog extends DetailsDialog {
 
         dateCompletedField.setEditable(false);
         dateCompletedField.setBackground(Color.GRAY);
-
-        milestoneDeadlineField.setEditable(false);
-        milestoneDeadlineField.setBackground(Color.GRAY);
 
         completeCheckBox.setEnabled(false);
     }

@@ -1,11 +1,13 @@
 package main;
 
 import com.mindfusion.common.DateTime;
+import com.mindfusion.drawing.SolidBrush;
 import com.mindfusion.scheduling.Calendar;
 import com.mindfusion.scheduling.CalendarAdapter;
 import com.mindfusion.scheduling.CalendarView;
 import com.mindfusion.scheduling.ItemMouseEvent;
 import com.mindfusion.scheduling.model.Appointment;
+import com.mindfusion.scheduling.model.Style;
 import main.lib.DatabaseManager;
 import main.lib.Milestone;
 import main.lib.Task;
@@ -17,7 +19,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -135,9 +136,22 @@ public class DashboardPanel extends JPanel implements ActionListener {
             appointment.setEndTime(endDate);
             appointment.setHeaderText("#" + milestone.getId() + "-" + milestone.getName());
             appointment.setAllowMove(false);
+
+            DateTime now = DateTime.now();
+            appointment.setStyle(new Style());
+            if (endDate.compareTo(now) < 0) {
+                appointment.getStyle().setBrush(new SolidBrush(Color.decode("#FF7F7F")));
+            } else if (endDate.getYear() == now.getYear()
+                            && endDate.getMonth() == now.getMonth()
+                            && endDate.getWeekOfYear() == now.getWeekOfYear()
+            ) {
+                appointment.getStyle().setBrush(new SolidBrush(Color.decode("#FFFF7F")));
+            } else {
+                appointment.getStyle().setBrush(new SolidBrush(Color.decode("#7FFF7F")));
+            }
+
             calendar.getSchedule().getItems().add(appointment);
         }
-        // Refresh the calendar to make sure the new appointments are displayed
         calendar.invalidate();
         calendar.repaint();
     }
@@ -156,7 +170,7 @@ public class DashboardPanel extends JPanel implements ActionListener {
         try {
             updateCalendarAndTasks();
         } catch (SQLException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to refresh data: " + e.getMessage());
         }
     }
 
