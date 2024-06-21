@@ -6,15 +6,18 @@ import java.sql.Date;
 
 public class Milestone {
     private final int id;
-    private final String name;
+    private String name;
     private final Date dateAdded;
-    private final Date deadline;
+    private Date deadline;
     private final Date dateCompleted;
-    private final String description;
+    private String description;
     private final int tasksAll;
     private final int tasksDone;
     private final int userId;
     private final int categoryId;
+    
+    public static final int MAX_NAME_LENGTH = 50;
+    public static final int MAX_DESCRIPTION_LENGTH = 200;
     
     public Milestone(ResultSet row) {
         try {
@@ -71,5 +74,17 @@ public class Milestone {
 
     public int getCategoryId() {
         return categoryId;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDeadline(Date deadline) {
+        this.deadline = deadline;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

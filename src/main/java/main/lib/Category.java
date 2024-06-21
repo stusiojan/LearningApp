@@ -5,12 +5,13 @@ import java.sql.SQLException;
 
 public class Category {
     private final int id;
-    private final String name;
-    private final String description; // nullable
-
+    private String name;
+    private String description; // nullable
     private final int tasksAll;
-
     private final int tasksDone;
+
+    public static final int MAX_NAME_LENGTH = 50;
+    public static final int MAX_DESCRIPTION_LENGTH = 200;
 
     public Category(ResultSet row) {
         try {
@@ -42,5 +43,13 @@ public class Category {
 
     public int getTasksDone() {
         return tasksDone;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

@@ -17,6 +17,7 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
     private JButton addButton;
     private JButton editButton;
     private JButton refreshButton;
+    private JCheckBox onlyForUserCheckBox;
     private JTree categoryTree;
     private DataNode selectedNode;
     private CategoryTreeRenderer categoryTreeRenderer;
@@ -30,6 +31,8 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
         editButton.addActionListener(this);
         refreshButton = new JButton("↻");
         refreshButton.addActionListener(this);
+        onlyForUserCheckBox = new JCheckBox("Only show categories with tasks for this user.", false);
+        onlyForUserCheckBox.addActionListener(this);
         categoryTreeRenderer = new CategoryTreeRenderer();
         rebuildUI();
     }
@@ -37,6 +40,7 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
     @Override
     public void actionPerformed(ActionEvent e) {
         final int MAX_NAME_LENGTH = 50;
+        var treeModel = (DefaultTreeModel)categoryTree.getModel();
 
         if (e.getSource() == refreshButton) {
             rebuildUI();
@@ -49,13 +53,25 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
             }
             DataNode child = selectedNode.addChild(user, name);
             selectedNode.reload();
-            var treeModel = (DefaultTreeModel)categoryTree.getModel();
             treeModel.insertNodeInto(child, selectedNode, selectedNode.getChildCount());
             
             nodeNameField.setText("");
         }
         else if (e.getSource() == editButton && selectedNode != null) {
-            selectedNode.edit(this);
+            //JPanel editPanel = selectedNode.getEditor();
+
+            var window = (JFrame)SwingUtilities.windowForComponent(this);
+            JDialog dialog = selectedNode.getEditor(window); //new JDialog(window, "Edit", true);
+            //dialog.getContentPane().add(editPanel);
+            dialog.pack();
+            dialog.setLocationRelativeTo(this);
+            dialog.setVisible(true);
+
+            selectedNode.reload();
+            treeModel.reload(selectedNode);
+        }
+        else if (e.getSource() == onlyForUserCheckBox) {
+            rebuildUI();
         }
     }
 
@@ -77,10 +93,7 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
         TreePath treePath = categoryTree.getClosestPathForLocation(e.getX(), e.getY());
 
         if (treePath != null) {
-            DataNode node = (DataNode)treePath.getLastPathComponent();
-
             if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
-                //node.edit(this);
             }
             else if (SwingUtilities.isRightMouseButton(e)) {
                 
@@ -95,6 +108,7 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
         controls.add(addButton);
         controls.add(editButton);
         controls.add(refreshButton);
+        controls.add(onlyForUserCheckBox);
         addButton.setEnabled(false);
         editButton.setEnabled(false);
 
@@ -115,10 +129,12 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
                 }
                 categoryNode.add(milestoneNode);
             }
-            root.add(categoryNode);
+            if (!(onlyForUserCheckBox.isSelected() && milestones.length == 0))
+                root.add(categoryNode);
         }
 
         categoryTree = new JTree(root);
+        categoryTree.setRowHeight(categoryTree.getRowHeight() + 4);
         JScrollPane treePane = new JScrollPane(categoryTree);
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -128,6 +144,8 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
 
         categoryTree.addTreeSelectionListener(this);
         categoryTree.setCellRenderer(categoryTreeRenderer);
+
+        //categoryTreeRenderer.setFont(categoryTree.getFont().deriveFont(32.0f));
 
         var thisPanel = this;
         categoryTree.addMouseListener(new MouseAdapter() {
@@ -149,7 +167,7 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
         }
         public abstract void reload();
         public abstract DataNode addChild(User user, String name);
-        public abstract void edit(Component parent);
+        public abstract JDialog getEditor(JFrame parent);
         public abstract String getText();
     }
 
@@ -162,7 +180,7 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
             int id = DatabaseManager.addCategory(name);
             return new CategoryNode(DatabaseManager.getCategory(id));
         }
-        public void edit(Component parent) {}
+        public JDialog getEditor(JFrame parent) { return null; }
         public String getText() { return "*"; }
     }
 
@@ -181,14 +199,12 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
             int id = DatabaseManager.addMilestone(name, user.getId(), category.getId());
             return new MilestoneNode(DatabaseManager.getMilestone(id));
         }
-        public void edit(Component parent) {
-            // TODO: editor modal
-            JOptionPane.showMessageDialog(parent, "Edit category: " + category.getName());
+        public JDialog getEditor(JFrame parent) {
+            return new EditCategoryDialog(parent, category);
         }
         public String getText() {
             String text = category.getName();
-            text += colored(" (" + category.getTasksAll() + ")", "gray");
-            text += colored(" (" + category.getTasksDone() + ")", "green");
+            text += colored(" [" + category.getTasksDone() + "/" + category.getTasksAll() + "]", "gray");
             return text;
         }
     };
@@ -208,14 +224,12 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
             int id = DatabaseManager.addTask(name, milestone.getId());
             return new TaskNode(DatabaseManager.getTask(id));
         }
-        public void edit(Component parent) {
-            // TODO: editor modal
-            JOptionPane.showMessageDialog(parent, "Edit milestone: " + milestone.getName());
+        public JDialog getEditor(JFrame parent) {
+            return new EditMilestoneDialog(parent, milestone);
         }
         public String getText() {
             String text = milestone.getName();
-            text += colored(" (" + milestone.getTasksAll() + ")", "gray");
-            text += colored(" (" + milestone.getTasksDone() + ")", "green");
+            text += colored(" [" + milestone.getTasksDone() + "/" + milestone.getTasksAll() + "]", "gray");
             return text;
         }
     };
@@ -233,9 +247,8 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
         }
         public DataNode addChild(User user, String name) { return null; }
 
-        public void edit(Component parent) {
-            // TODO: editor modal
-            JOptionPane.showMessageDialog(parent, "Edit task: " + task.getName());
+        public JDialog getEditor(JFrame parent) {
+            return new EditTaskDialog(parent, task);
         }
         public String getText() {
             String color = (task.getDateCompleted() != null) ? "green" : "red";

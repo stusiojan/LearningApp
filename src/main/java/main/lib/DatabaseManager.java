@@ -2,7 +2,6 @@ package main.lib;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.function.Function;
 import java.util.Optional;
 import java.time.LocalDate;
@@ -248,6 +247,62 @@ public class DatabaseManager {
             return id;
         } catch (SQLException e) {
             throw new RuntimeException("Failed to add new task: " + e);
+        }
+    }
+
+    public static void updateCategory(Category category) {
+        String sql = "UPDATE categories SET cat_name = ?, cat_description = ? WHERE cat_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, category.getName());
+            statement.setString(2, category.getDescription());
+            statement.setInt(3, category.getId());
+            statement.executeUpdate();
+            statement.close();
+        }  catch (SQLException e) {
+            throw new RuntimeException("Failed to update category: " + e);
+        }
+    }
+
+    public static void updateMilestone(Milestone milestone) {
+        String sql = "UPDATE milestones SET mil_name = ?, deadline = ?, mil_description = ? WHERE mil_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, milestone.getName());
+            statement.setDate(2, milestone.getDeadline());
+            statement.setString(3, milestone.getDescription());
+            statement.setInt(4, milestone.getId());
+            statement.executeUpdate();
+            statement.close();
+        }  catch (SQLException e) {
+            throw new RuntimeException("Failed to update milestone: " + e);
+        }
+    }
+
+    public static void updateTask(Task task) {
+        String sql = "UPDATE tasks SET task_name = ?, task_completed = ?, task_description = ? WHERE task_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, task.getName());
+            statement.setDate(2, task.getDateCompleted());
+            statement.setString(3, task.getDescription());
+            statement.setInt(4, task.getId());
+            statement.executeUpdate();
+            statement.close();
+        }  catch (SQLException e) {
+            throw new RuntimeException("Failed to update task: " + e);
+        }
+    }
+    
+    // To be called after the value of task_completed has changed.
+    public static void switchTaskDone(int taskId) {
+        try {
+            CallableStatement statement = connection.prepareCall("CALL switch_task_done(?)");
+            statement.setInt(1, taskId);
+            statement.execute();
+            statement.close();
+        }  catch (SQLException e) {
+            throw new RuntimeException("Failed to call switch_task_done: " + e);
         }
     }
 
