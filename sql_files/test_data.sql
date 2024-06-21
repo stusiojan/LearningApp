@@ -2,7 +2,7 @@ ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY/MM/DD HH24:MI:SS';
 
 
 
-INSERT INTO users (login, hash, salt) VALUES ('user1', 'e308ccb52a8d432a3bf80fdf727e6dedbc6d893906d81ed7e3907d282c13fa0d', '12345678abcdefgh');
+INSERT INTO users (login, hash, salt) VALUES ('user1', '5946a3c26c7445d73b3ae037b01b6e7a28e88daccd18ee919420d4c77c88da4f', '12345678abcdefgh'); -- password: user1
     INSERT INTO categories (cat_name, cat_description, cat_tasks_done) VALUES ('Niemiecki', 'Język niemiecki', 0);
 
     INSERT INTO categories (cat_name, cat_description, cat_tasks_done) VALUES ('Python', NULL, 3);
@@ -15,11 +15,11 @@ INSERT INTO users (login, hash, salt) VALUES ('user1', 'e308ccb52a8d432a3bf80fdf
 
 
 
-INSERT INTO users (login, hash, salt) VALUES ('user2', '22957f4668107d34db8e6aed36b4610091e12e311c44ef38fe37ed7a735d17e9', '1234567890123456');
+INSERT INTO users (login, hash, salt) VALUES ('user2', 'c06998d4eaf16c13bf03f3774d2fea5b461991166ab8f028fca59544157b3c2f', '1234567890123456'); -- password: user2
 
 
 
-INSERT INTO users (login, hash, salt) VALUES ('user3', 'd7111d2b45efda000f1d09a014f4d5763d5981f32126541ef7dda8e46c7fdf15', 'a1b2c3d4e5f6g7h8');
+INSERT INTO users (login, hash, salt) VALUES ('user3', '7f38e2fc2263a8e04f96cea8e3ca5dcb3bc3b33c9411e2d7d5866f61f484dfaf', 'a1b2c3d4e5f6g7h8'); -- password: user3
     INSERT INTO categories (cat_name, cat_description, cat_tasks_done) VALUES ('Bazy Danych 2', 'Projektowanie aplikacji z bazami danych przy użyciu zaawansowanych mechanizmów', 6);
         INSERT INTO milestones (mil_name, date_added, deadline, mil_completed, mil_description, mil_tasks_done, user_id, cat_id) VALUES ('Egzamin', TO_DATE('2024/02/26 20:11:34'), TO_DATE('2024/06/17'), TO_DATE('2024/03/02 21:24:20'), 'Egzamin - wszystkie wykłady', 6, 3, 3);
             INSERT INTO tasks (task_name, task_completed, task_description, mil_id) VALUES ('Wykład - wprowadzenie',     TO_DATE('2024/03/01 20:17:34'), NULL, 3);
