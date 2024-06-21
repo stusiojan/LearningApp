@@ -6,10 +6,13 @@ import java.sql.Date;
 
 public class Task {
     private final int id;
-    private final String name;
-    private final Date dateCompleted;
-    private final String description;
+    private String name;
+    private Date dateCompleted;
+    private String description;
     private final int milestoneId;
+
+    public static final int MAX_NAME_LENGTH = 50;
+    public static final int MAX_DESCRIPTION_LENGTH = 200;
 
     public Task(ResultSet row) {
         try {
@@ -49,5 +52,17 @@ public class Task {
 
     public int getMilestoneId() {
         return milestoneId;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDateCompleted(Date dateCompleted) {
+        this.dateCompleted = dateCompleted;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

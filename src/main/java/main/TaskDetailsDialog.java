@@ -101,7 +101,7 @@ public class TaskDetailsDialog extends DetailsDialog {
                 this.task.getMilestoneId()
         );
 
-        DatabaseManager.updateTask(task);
+        DatabaseManager.updateEntireTask(task);
         refreshCallback.run();
     }
 
