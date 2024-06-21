@@ -2,7 +2,6 @@ package main.lib;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.function.Function;
 import java.util.Optional;
@@ -63,7 +62,7 @@ public class DatabaseManager {
             if (result.next())
                 return function.apply(result);
             else
-                throw new SQLException("Failed to retrieve by id.");
+                return null;
         } catch (SQLException e) {
             throw new RuntimeException("Failed to retrieve: " + e);
         }
@@ -163,6 +162,17 @@ public class DatabaseManager {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, userId);
             statement.setInt(2, categoryId);
+            return selectQuery(statement, Milestone::new, Milestone[]::new);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to get milestones" + e);
+        }
+    }
+
+    public static Milestone[] getMilestonesByCategory(int categoryId) {
+        String sql = "SELECT * FROM milestones WHERE cat_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, categoryId);
             return selectQuery(statement, Milestone::new, Milestone[]::new);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to get milestones" + e);
@@ -324,11 +334,32 @@ public class DatabaseManager {
         }
     }
 
+    public static void deleteCategory(int categoryId, int userId) {
+        // Deletes only the milestones that belong to the specified user.
+        boolean deleteCategory = true;
+        var milestones = getMilestonesByCategory(categoryId);
+        for (var mil : milestones) {
+            if (mil.getUserId() == userId)
+                deleteMilestone(mil.getId());
+            else
+                deleteCategory = false;
+        }
+        
+        // If there are no milestones from other users, delete the category.
+        if (deleteCategory)
+            deleteById("DELETE FROM categories WHERE cat_id = ?", categoryId);
+    }
+
     public static void deleteCategory(int categoryId) {
+        var milestones = getMilestonesByCategory(categoryId);
+        for (var mil : milestones) {
+            deleteMilestone(mil.getId());
+        }
         deleteById("DELETE FROM categories WHERE cat_id = ?", categoryId);
     }
 
     public static void deleteMilestone(int milestoneId) {
+        deleteById("DELETE FROM tasks WHERE mil_id = ?", milestoneId);  
         deleteById("DELETE FROM milestones WHERE mil_id = ?", milestoneId);
     }
 
