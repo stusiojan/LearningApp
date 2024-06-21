@@ -65,7 +65,6 @@ public class DashboardPanel extends JPanel implements ActionListener {
                 String milestoneId = item.getHeaderText().split("-")[0].substring(1);
                 Milestone milestone = DatabaseManager.getMilestone(Integer.parseInt(milestoneId));
                 if (milestone != null) {
-                    System.out.println(milestone.getName());
                     MilestoneDetailsDialog dialog = new MilestoneDetailsDialog(milestone, DashboardPanel.this::refreshData);
                     dialog.setLocationRelativeTo(DashboardPanel.this);
                     dialog.setVisible(true);

@@ -102,6 +102,9 @@ public class TaskDetailsDialog extends DetailsDialog {
         );
 
         DatabaseManager.updateEntireTask(task);
+        if (completeCheckBox.isSelected() && this.task.getDateCompleted() == null) {
+            DatabaseManager.switchTaskDone(task.getId());
+        }
         refreshCallback.run();
     }
 
@@ -122,7 +125,8 @@ public class TaskDetailsDialog extends DetailsDialog {
         taskNameField.setBackground(Color.WHITE);
         taskDescriptionField.setEditable(true);
         taskDescriptionField.setBackground(Color.WHITE);
-        completeCheckBox.setEnabled(true);
+        if(task.getDateCompleted() == null)
+            completeCheckBox.setEnabled(true);
     }
 
     @Override
