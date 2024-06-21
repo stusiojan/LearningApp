@@ -68,7 +68,15 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
             dialog.setVisible(true);
 
             selectedNode.reload();
-            treeModel.reload(selectedNode);
+
+            if (selectedNode.getUserObject() == null) {
+                // This node has been deleted
+                treeModel.removeNodeFromParent(selectedNode);
+                //treeModel.reload(selectedNode.getParent());
+            } 
+            else {
+                treeModel.reload(selectedNode);
+            }
         }
         else if (e.getSource() == onlyForUserCheckBox) {
             rebuildUI();
@@ -113,7 +121,7 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
         editButton.setEnabled(false);
 
         selectedNode = null;
-        var root = new RootNode("*");
+        var root = new RootNode();
 
         Category[] categories = DatabaseManager.getCategories();
         for (var category : categories) {
@@ -162,7 +170,7 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
      * Custom node types for JTree 
     */
     abstract class DataNode extends DefaultMutableTreeNode {
-        public DataNode(String name) {
+        public DataNode(Object name) {
             super(name);
         }
         public abstract void reload();
@@ -172,8 +180,8 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
     }
 
     class RootNode extends DataNode {
-        public RootNode(String name) {
-            super(name);
+        public RootNode() {
+            super("*");
         }
         public void reload() {}
         public DataNode addChild(User user, String name) {
@@ -188,11 +196,12 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
         private Category category;
 
         public CategoryNode(Category category) {
-            super(category.getName());
+            super(category);
             this.category = category;
         }
         public void reload() {
             category = DatabaseManager.getCategory(category.getId());
+            setUserObject(category);
             ((DataNode)getParent()).reload();
         }
         public DataNode addChild(User user, String name) {
@@ -213,11 +222,12 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
         private Milestone milestone;
 
         public MilestoneNode(Milestone milestone) {
-            super(milestone.getName());
+            super(milestone);
             this.milestone = milestone;
         }
         public void reload() {
             milestone = DatabaseManager.getMilestone(milestone.getId());
+            setUserObject(milestone);
             ((DataNode)getParent()).reload();
         }
         public DataNode addChild(User user, String name) {
@@ -238,11 +248,12 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
         private Task task;
 
         public TaskNode(Task task) {
-            super(task.getName());
+            super(task);
             this.task = task;
         }
         public void reload() {
             task = DatabaseManager.getTask(task.getId());
+            setUserObject(task);
             ((DataNode)getParent()).reload();
         }
         public DataNode addChild(User user, String name) { return null; }
