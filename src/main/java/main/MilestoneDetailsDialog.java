@@ -149,7 +149,7 @@ public class MilestoneDetailsDialog extends DetailsDialog {
                 this.milestone.getCategoryId()
         );
 
-        DatabaseManager.updateEntireMilestone(milestone);
+        DatabaseManager.updateMilestone(milestone);
         refreshCallback.run();
     }
 

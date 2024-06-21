@@ -101,7 +101,7 @@ public class TaskDetailsDialog extends DetailsDialog {
                 this.task.getMilestoneId()
         );
 
-        DatabaseManager.updateEntireTask(task);
+        DatabaseManager.updateTask(task);
         if (completeCheckBox.isSelected() && this.task.getDateCompleted() == null) {
             DatabaseManager.switchTaskDone(task.getId());
         }
