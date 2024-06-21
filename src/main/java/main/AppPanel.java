@@ -6,14 +6,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 public class AppPanel extends JPanel implements ActionListener {
 
     private JPanel mainPanel;
     private JMenuItem userLogout;
 
-    public AppPanel(JPanel mainPanel, User user)
-    {
+    public AppPanel(JPanel mainPanel, User user) throws SQLException {
         this.mainPanel = mainPanel;
 
         userLogout = new JMenuItem("Logout");

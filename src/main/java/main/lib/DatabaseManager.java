@@ -2,6 +2,8 @@ package main.lib;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 import java.util.function.Function;
 import java.util.Optional;
 import java.time.LocalDate;
@@ -139,6 +141,22 @@ public class DatabaseManager {
         }
     }
 
+    public static List<Milestone> getMilestones(int userId) {
+        String sql = "SELECT * FROM milestones WHERE user_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, userId);
+            ResultSet result = statement.executeQuery();
+            List<Milestone> milestones = new ArrayList<>();
+            while (result.next()) {
+                milestones.add(new Milestone(result));
+            }
+            return milestones;
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to get milestones: " + e);
+        }
+    }
+
     public static Milestone[] getMilestones(int categoryId, int userId) {
         String sql = "SELECT * FROM milestones WHERE user_id = ? AND cat_id = ?";
         try {
@@ -177,7 +195,7 @@ public class DatabaseManager {
     public static int addCategory(String categoryName) {
         String sql = "INSERT INTO categories (cat_name, cat_description) VALUES (?, ?)";
         try {
-            String returns[] = { "cat_id" };
+            String[] returns = { "cat_id" };
             PreparedStatement statement = connection.prepareStatement(sql, returns);
             statement.setString(1, categoryName);
             statement.setString(2, "");
@@ -202,7 +220,7 @@ public class DatabaseManager {
 
         String sql = "INSERT INTO milestones (mil_name, date_added, deadline, mil_description, user_id, cat_id) VALUES (?, ?, ?, ?, ?, ?)";
         try {
-            String returns[] = { "mil_id" };
+            String[] returns = { "mil_id" };
             PreparedStatement statement = connection.prepareStatement(sql, returns);
             statement.setString(1, milestoneName);
             statement.setDate(2, dateAdded);
@@ -228,7 +246,7 @@ public class DatabaseManager {
     public static int addTask(String taskName, int milestoneId) {
         String sql = "INSERT INTO tasks (task_name, task_description, mil_id) VALUES (?, ?, ?)";
         try {
-            String returns[] = { "task_id" };
+            String[] returns = { "task_id" };
             PreparedStatement statement = connection.prepareStatement(sql, returns);
             statement.setString(1, taskName);
             statement.setString(2, "");
@@ -293,7 +311,7 @@ public class DatabaseManager {
             throw new RuntimeException("Failed to update task: " + e);
         }
     }
-    
+
     // To be called after the value of task_completed has changed.
     public static void switchTaskDone(int taskId) {
         try {
@@ -317,4 +335,102 @@ public class DatabaseManager {
     public static void deleteTask(int taskId) {
         deleteById("DELETE FROM tasks WHERE task_id = ?",taskId);
     }
+
+    public static List<String> fetchOverdueTasks(int userId) throws SQLException {
+        return getTasks(
+                "SELECT 'C' || m.cat_id || 'M' || m.mil_id || '#' || t.task_id || ' - ' || t.task_name " +
+                        "FROM tasks t " +
+                        "JOIN milestones m ON t.mil_id = m.mil_id " +
+                        "WHERE t.task_completed IS NULL " +
+                        "AND m.deadline < SYSDATE " +
+                        "AND m.user_id = ?",
+                userId
+        );
+    }
+
+    public static List<String> fetchTasksForWeek(int userId) throws SQLException {
+        return getTasks(
+                "SELECT 'C' || m.cat_id || 'M' || m.mil_id || '#' || t.task_id || ' - ' || t.task_name " +
+                        "FROM tasks t " +
+                        "JOIN milestones m ON t.mil_id = m.mil_id " +
+                        "WHERE t.task_completed IS NULL " +
+                        "AND m.deadline BETWEEN TRUNC(SYSDATE, 'IW') AND TRUNC(SYSDATE, 'IW') + 6 " +
+                        "AND m.user_id = ?",
+                userId
+        );
+    }
+
+    public static List<String> fetchTasksForMonth(int userId) throws SQLException {
+        return getTasks(
+                "SELECT 'C' || m.cat_id || 'M' || m.mil_id || '#' || t.task_id || ' - ' || t.task_name " +
+                        "FROM tasks t " +
+                        "JOIN milestones m ON t.mil_id = m.mil_id " +
+                        "WHERE t.task_completed IS NULL " +
+                        "AND m.deadline BETWEEN TRUNC(SYSDATE, 'WW') AND TRUNC(SYSDATE, 'WW') + INTERVAL '1' MONTH " +
+                        "AND m.user_id = ?",
+                userId
+        );
+    }
+
+    public static List<String> fetchAllTasks(int userId) throws SQLException {
+        return getTasks(
+                "SELECT 'C' || m.cat_id || 'M' || m.mil_id || '#' || t.task_id || ' - ' || t.task_name " +
+                        "FROM tasks t " +
+                        "JOIN milestones m ON t.mil_id = m.mil_id " +
+                        "WHERE t.task_completed IS NULL " +
+                        "AND m.user_id = ?",
+                userId
+        );
+    }
+
+    private static List<String> getTasks(String query, int userId) throws SQLException {
+        List<String> tasks = new ArrayList<>();
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, userId);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                tasks.add(resultSet.getString(1));
+            }
+        } catch (SQLException e) {
+            throw new SQLException("Failed to get list of tasks: " + e.getMessage());
+        }
+        return tasks;
+    }
+
+    public static void updateEntireTask(Task task) {
+        String sql = "UPDATE tasks SET task_name = ?, task_description = ?, task_completed = ? WHERE task_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, task.getName());
+            statement.setString(2, task.getDescription());
+            statement.setDate(3, task.getDateCompleted());
+            statement.setInt(4, task.getId());
+            statement.executeUpdate();
+            statement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to update task: " + e);
+        }
+    }
+
+    public static void updateEntireMilestone(Milestone milestone) {
+        String sql = "UPDATE milestones SET mil_name = ?, date_added = ?, deadline = ?, mil_description = ?, mil_completed = ?, mil_tasks_all = ?, mil_tasks_done = ? WHERE mil_id = ?";
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, milestone.getName());
+            statement.setDate(2, milestone.getDateAdded());
+            statement.setDate(3, milestone.getDeadline());
+            statement.setString(4, milestone.getDescription());
+            statement.setDate(5, milestone.getDateCompleted());
+            statement.setInt(6, milestone.getTasksAll());
+            statement.setInt(7, milestone.getTasksDone());
+            statement.setInt(8, milestone.getId());
+            statement.executeUpdate();
+            statement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to update milestone: " + e);
+        }
+    }
 }
+
+
