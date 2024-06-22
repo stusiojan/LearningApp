@@ -1,6 +1,8 @@
 import java.sql.Date;
 import java.util.*;
 
+import javax.xml.crypto.Data;
+
 import org.junit.Assert;
 import org.junit.Test;
 import main.lib.*;
@@ -68,6 +70,8 @@ public class TestDatabaseManager {
         Assert.assertEquals("Najważniejsze elementy języka", milestones[0].getDescription());
         Assert.assertEquals(Date.valueOf("2024-2-2"), milestones[0].getDateAdded());
         Assert.assertEquals("Programowanie obiektowe", milestones[1].getName());
+
+        DatabaseManager.disconnect();
     }
 
     @Test
@@ -84,5 +88,56 @@ public class TestDatabaseManager {
         Assert.assertEquals(1, tasks.size());
         Assert.assertEquals(Date.valueOf("2024-02-04"), tasks.get(0).getDateCompleted());
         Assert.assertEquals("Ciągi znaków, liczby całkowite i zmiennoprzecinkowe", tasks.get(0).getDescription());
+
+        DatabaseManager.disconnect();
+    }
+
+    @Test
+    public void testAddUpdateDeleteCategory() {
+        DatabaseManager.connect(true);
+
+        // Check categories
+        String catName = "My Test Category 123456";
+        var categories = DatabaseManager.getCategories();
+        for (var cat : categories) {
+            Assert.assertNotEquals(cat.getName(), catName);
+        }
+
+        // Add category
+        DatabaseManager.addCategory(catName);
+
+        categories = DatabaseManager.getCategories();
+        int numCatsFound = 0;
+        Category testCat = null;
+        for (var cat : categories) {
+            if (cat.getName().equals(catName)) {
+                numCatsFound += 1;
+                testCat = cat;
+            }
+        }
+        Assert.assertEquals(numCatsFound, 1);
+
+        // Update category
+        catName = "Another Test Category 123456";
+        testCat.setName(catName);
+        DatabaseManager.updateCategory(testCat);
+
+        categories = DatabaseManager.getCategories();
+        numCatsFound = 0;
+        for (var cat : categories) {
+            if (cat.getName().equals(catName)) {
+                numCatsFound += 1;
+            }
+        }
+        Assert.assertEquals(numCatsFound, 1);
+
+        // Delete category
+        DatabaseManager.deleteCategory(testCat.getId());
+        categories = DatabaseManager.getCategories();
+        for (var cat : categories) {
+            Assert.assertNotEquals(cat.getName(), catName);
+        }
+
+        DatabaseManager.disconnect();
     }
 }
