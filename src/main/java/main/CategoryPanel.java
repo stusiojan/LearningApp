@@ -3,8 +3,7 @@ package main;
 import main.lib.*;
 
 import javax.swing.*;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
+import javax.swing.event.*;
 import javax.swing.tree.*;
 
 import java.awt.*;
@@ -21,6 +20,8 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
     private JTree categoryTree;
     private DataNode selectedNode;
     private CategoryTreeRenderer categoryTreeRenderer;
+    private JList<Task> completedTaskList;
+    private TaskListRenderer taskListRenderer;
     
     public CategoryPanel(User user) {
         this.user = user;
@@ -34,6 +35,7 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
         onlyForUserCheckBox = new JCheckBox("Only show categories with tasks for this user.", false);
         onlyForUserCheckBox.addActionListener(this);
         categoryTreeRenderer = new CategoryTreeRenderer();
+        taskListRenderer = new TaskListRenderer();
         rebuildUI();
     }
     
@@ -77,6 +79,7 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
             else {
                 treeModel.reload(selectedNode);
             }
+            updateCompletedTaskList();
         }
         else if (e.getSource() == onlyForUserCheckBox) {
             rebuildUI();
@@ -101,10 +104,8 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
         TreePath treePath = categoryTree.getClosestPathForLocation(e.getX(), e.getY());
 
         if (treePath != null) {
-            if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
-            }
-            else if (SwingUtilities.isRightMouseButton(e)) {
-                
+            if (SwingUtilities.isLeftMouseButton(e)) {
+                completedTaskList.clearSelection();
             }
         }
     }
@@ -123,6 +124,7 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
         selectedNode = null;
         var root = new RootNode();
 
+        /*** Create category tree ***/
         Category[] categories = DatabaseManager.getCategories();
         for (var category : categories) {
             var categoryNode = new CategoryNode(category);
@@ -144,17 +146,67 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
         categoryTree = new JTree(root);
         categoryTree.setRowHeight(categoryTree.getRowHeight() + 4);
         JScrollPane treePane = new JScrollPane(categoryTree);
+
+        /*** Create completed task list ***/
+        completedTaskList = new JList<Task>();
+        updateCompletedTaskList();
+        completedTaskList.addListSelectionListener(new ListSelectionListener() {
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (e.getValueIsAdjusting())
+                    return;
+                int index = completedTaskList.getSelectedIndex();
+                if (index < 0)
+                    return;
+
+                var listModel = completedTaskList.getModel();
+                int taskId = listModel.getElementAt(index).getId();
+
+                var treeModel = (DefaultTreeModel)categoryTree.getModel();
+                var root = (DataNode)treeModel.getRoot();
+                var df = root.depthFirstEnumeration();
+                while (df.hasMoreElements()) {
+                    var node = (DataNode)df.nextElement();
+                    if (node instanceof TaskNode) {
+                        if (taskId == ((TaskNode)node).getTask().getId()) {
+                            var path = new TreePath(treeModel.getPathToRoot(node));
+                            categoryTree.setSelectionPath(path);
+                            categoryTree.scrollPathToVisible(path);
+                            treeModel.reload(node);
+                        }
+                    }
+                }
+            }
+        });
+        completedTaskList.setCellRenderer(taskListRenderer);
+        JScrollPane taskHistoryPane = new JScrollPane(completedTaskList);
+        JPanel taskPane = new JPanel(new BorderLayout());
+        var label = new JLabel("<html><b>"+colored("Completed Tasks", "green")+"</b></html>");
+        taskPane.add(label, BorderLayout.PAGE_START);
+        taskPane.add(taskHistoryPane, BorderLayout.CENTER);
+
+        
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, treePane, taskPane);
+        splitPane.setResizeWeight(0.70);
         setLayout(new BorderLayout());
         add(controls, BorderLayout.PAGE_START);
-        add(treePane, BorderLayout.CENTER);
+        //add(treePane, BorderLayout.CENTER);
+        add(splitPane, BorderLayout.CENTER);
 
         categoryTree.addTreeSelectionListener(this);
         categoryTree.setCellRenderer(categoryTreeRenderer);
+        categoryTree.setExpandsSelectedPaths(true);
 
         var thisPanel = this;
         categoryTree.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) { thisPanel.mouseClicked(e); }
         });
+    }
+
+    private void updateCompletedTaskList() {
+        var completedTasks = DatabaseManager.getCompletedTasks(user.getId());
+        completedTaskList.setListData(completedTasks);
     }
 
     private String colored(String text, String color) {
@@ -261,6 +313,9 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
             String color = (task.getDateCompleted() != null) ? "green" : "red";
             return colored(task.getName(), color);
         }
+        public Task getTask() {
+            return task;
+        }
     };
 
     public class CategoryTreeRenderer extends DefaultTreeCellRenderer {
@@ -277,5 +332,19 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
             this.setText("<html>" + node.getText() + "</html>");
             return this;
         }
+    }
+
+    public class TaskListRenderer extends DefaultListCellRenderer {
+       
+        public TaskListRenderer() {
+        }
+    
+        @Override
+        public Component getListCellRendererComponent(JList<? extends Object> list, Object obj, int index,
+                                                      boolean isSelected, boolean cellHasFocus) {   
+            var task = (Task)obj;
+            super.getListCellRendererComponent(list, task.getName(), index, isSelected, cellHasFocus);
+            return this;
+        } 
     }
 }

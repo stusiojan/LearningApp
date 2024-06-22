@@ -190,6 +190,18 @@ public class DatabaseManager {
         }
     }
 
+    public static Task[] getCompletedTasks(int userId) {
+        String sql = "SELECT t.* from TASKS t, milestones m WHERE t.mil_id = m.mil_id AND m.user_id = ? AND task_completed IS NOT NULL ORDER BY task_completed DESC";
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, userId);
+            return selectQuery(statement, Task::new, Task[]::new);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to get tasks" + e);
+        }
+    }
+
+
     public static Category getCategory(int categoryId) {
         return selectById("SELECT * FROM categories WHERE cat_id = ?", Category::new, categoryId);
     }
