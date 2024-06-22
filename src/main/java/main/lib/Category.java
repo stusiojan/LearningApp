@@ -46,10 +46,11 @@ public class Category {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.length() > MAX_NAME_LENGTH ?  name.substring(0, MAX_NAME_LENGTH) : name;
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = description.length() > MAX_DESCRIPTION_LENGTH
+                ? description.substring(0, MAX_DESCRIPTION_LENGTH) : description;
     }
 }
