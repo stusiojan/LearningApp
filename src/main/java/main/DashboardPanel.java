@@ -14,12 +14,14 @@ import main.lib.Task;
 import main.lib.User;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
 public class DashboardPanel extends JPanel implements ActionListener {
@@ -28,6 +30,7 @@ public class DashboardPanel extends JPanel implements ActionListener {
     private final DefaultListModel<String> taskListModel;
     private final JComboBox<String> selectBox;
     private final JList<String> taskList;
+    private final JLabel taskCountLabel;
     public DashboardPanel(User user) throws SQLException {
         this.user = user;
         this.calendar = new Calendar();
@@ -35,6 +38,8 @@ public class DashboardPanel extends JPanel implements ActionListener {
         String[] selectBoxLabels = {"All Tasks", "Overdue Tasks", "Tasks for the Week", "Tasks for the Month"};
         this.selectBox = new JComboBox<>(selectBoxLabels);
         this.taskList = new JList<>(taskListModel);
+        this.taskCountLabel = new JLabel("Total Tasks: 0");
+        taskCountLabel.setFont(new Font("Arial", Font.BOLD, 14));
 
         initializeUI();
         updateCalendarAndTasks();
@@ -55,6 +60,39 @@ public class DashboardPanel extends JPanel implements ActionListener {
                         showTaskDetails(selectedTaskName);
                     }
                 }
+            }
+        });
+
+        taskList.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                String taskString = (String) value;
+                String[] parts = taskString.split("\\$#");
+                String taskContent = parts[0];
+                String deadline = parts[1];
+
+                JLabel taskLabel = new JLabel(taskContent);
+                taskLabel.setHorizontalAlignment(SwingConstants.LEFT);
+                taskLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+                JLabel deadlineLabel = new JLabel(deadline);
+                deadlineLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+                deadlineLabel.setFont(new Font("Arial", Font.BOLD, 14));
+                deadlineLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+                JPanel panel = new JPanel(new BorderLayout());
+                panel.add(taskLabel, BorderLayout.WEST);
+                panel.add(deadlineLabel, BorderLayout.EAST);
+
+                if (isSelected) {
+                    panel.setBackground(list.getSelectionBackground());
+                    panel.setForeground(list.getSelectionForeground());
+                } else {
+                    panel.setBackground(list.getBackground());
+                    panel.setForeground(list.getForeground());
+                }
+
+                return panel;
             }
         });
 
@@ -88,9 +126,29 @@ public class DashboardPanel extends JPanel implements ActionListener {
     }
 
     private JPanel createTaskListPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(new JScrollPane(taskList), BorderLayout.CENTER);
-        panel.add(createFilterPanel(), BorderLayout.SOUTH);
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        // Center taskCountLabel horizontally
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        panel.add(taskCountLabel, gbc);
+
+        // Add JScrollPane
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        panel.add(new JScrollPane(taskList), gbc);
+
+        // Add filter panel
+        gbc.gridy = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1;
+        gbc.weighty = 0;
+        panel.add(createFilterPanel(), gbc);
+
         return panel;
     }
 
@@ -119,6 +177,7 @@ public class DashboardPanel extends JPanel implements ActionListener {
         for (String taskLabel : tasks) {
             taskListModel.addElement(taskLabel);
         }
+        taskCountLabel.setText("Total Tasks: " + tasks.size());
     }
 
     private void populateCalendar(List<Milestone> milestones) {
