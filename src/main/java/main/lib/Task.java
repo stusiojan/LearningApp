@@ -3,6 +3,7 @@ package main.lib;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 
 public class Task {
     private final int id;
@@ -55,7 +56,7 @@ public class Task {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.length() > MAX_NAME_LENGTH ? name.substring(0, MAX_NAME_LENGTH) : name;
     }
 
     public void setDateCompleted(Date dateCompleted) {
@@ -63,6 +64,12 @@ public class Task {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        this.description = description.length() > MAX_DESCRIPTION_LENGTH
+                ? description.substring(0, MAX_DESCRIPTION_LENGTH) : description;
+    }
+
+    public String dateCompletedToString() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        return sdf.format(this.dateCompleted);
     }
 }
