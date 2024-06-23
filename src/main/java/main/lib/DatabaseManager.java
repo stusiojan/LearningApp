@@ -375,6 +375,7 @@ public class DatabaseManager {
     public static List<String> fetchOverdueTasks(int userId) throws SQLException {
         return getTasks(
                 "SELECT 'C' || m.cat_id || 'M' || m.mil_id || '#' || t.task_id || ' - ' || t.task_name " +
+                        "|| ' (Deadline: ' || TO_CHAR(m.deadline, 'DD-MM-YYYY') || ')'" +
                         "FROM tasks t " +
                         "JOIN milestones m ON t.mil_id = m.mil_id " +
                         "WHERE t.task_completed IS NULL " +
@@ -386,8 +387,6 @@ public class DatabaseManager {
 
     public static List<String> fetchTasksForWeek(int userId) throws SQLException {
         return getTasks(
-                "SELECT 'C' || m.cat_id || 'M' || m.mil_id || '#' || t.task_id || ' - ' || t.task_name " +
-                        "FROM tasks t " +
                         "JOIN milestones m ON t.mil_id = m.mil_id " +
                         "WHERE t.task_completed IS NULL " +
                         "AND m.deadline BETWEEN TRUNC(SYSDATE, 'IW') AND TRUNC(SYSDATE, 'IW') + 6 " +
@@ -398,8 +397,6 @@ public class DatabaseManager {
 
     public static List<String> fetchTasksForMonth(int userId) throws SQLException {
         return getTasks(
-                "SELECT 'C' || m.cat_id || 'M' || m.mil_id || '#' || t.task_id || ' - ' || t.task_name " +
-                        "FROM tasks t " +
                         "JOIN milestones m ON t.mil_id = m.mil_id " +
                         "WHERE t.task_completed IS NULL " +
                         "AND m.deadline BETWEEN TRUNC(SYSDATE, 'WW') AND TRUNC(SYSDATE, 'WW') + INTERVAL '1' MONTH " +
@@ -410,8 +407,6 @@ public class DatabaseManager {
 
     public static List<String> fetchAllTasks(int userId) throws SQLException {
         return getTasks(
-                "SELECT 'C' || m.cat_id || 'M' || m.mil_id || '#' || t.task_id || ' - ' || t.task_name " +
-                        "FROM tasks t " +
                         "JOIN milestones m ON t.mil_id = m.mil_id " +
                         "WHERE t.task_completed IS NULL " +
                         "AND m.user_id = ?",
@@ -420,9 +415,14 @@ public class DatabaseManager {
     }
 
     private static List<String> getTasks(String query, int userId) throws SQLException {
+        String outputQuery =
+                "SELECT 'C' || m.cat_id || 'M' || m.mil_id || '#' || t.task_id || ' - ' || t.task_name " +
+                "|| '$#' || TO_CHAR(m.deadline, 'DD-MM-YYYY') " +
+                "FROM tasks t "
+                        + query;
         List<String> tasks = new ArrayList<>();
         try {
-            PreparedStatement statement = connection.prepareStatement(query);
+            PreparedStatement statement = connection.prepareStatement(outputQuery);
             statement.setInt(1, userId);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
