@@ -1,9 +1,13 @@
 import java.sql.Date;
+import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.*;
 
 import javax.xml.crypto.Data;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import main.lib.*;
 
@@ -140,4 +144,104 @@ public class TestDatabaseManager {
 
         DatabaseManager.disconnect();
     }
+
+    @Test
+    public void testGetTasksList_All() throws SQLException {
+        DatabaseManager.connect(true);
+        try {
+            DatabaseManager.startTransaction();
+
+            // All Tasks
+            List<String> allTasks = DatabaseManager.fetchAllTasks(3); // mil_id = 3->9
+            Assert.assertEquals(14, allTasks.size());
+        } catch (SQLException e) {
+            throw new SQLException("Failed to fetch tasks list.");
+        } finally {
+            DatabaseManager.rollbackTransaction();
+            DatabaseManager.disconnect();
+        }
+    }
+
+    @Test
+    public void testGetTaskList_Overdue() throws SQLException {
+        DatabaseManager.connect(true);
+        try {
+            DatabaseManager.startTransaction();
+
+            // Overdue Tasks
+            List<String> overDueTasks = DatabaseManager.fetchOverdueTasks(3);
+            Assert.assertEquals(9, overDueTasks.size());
+            Milestone milestone = DatabaseManager
+                    .getMilestones(3)
+                    .stream()
+                    .filter(m -> m.getId() == 4)
+                    .findFirst()
+                    .get(); // Milestone 4 has 3 tasks -> to overdue
+            milestone.setDeadline(Date.valueOf(LocalDate.now().minusDays(1)));
+            DatabaseManager.updateMilestone(milestone);
+            overDueTasks = DatabaseManager.fetchOverdueTasks(3);
+            Assert.assertEquals(9, overDueTasks.size());
+        } catch (SQLException e) {
+            throw new SQLException("Failed to fetch overdue tasks list.");
+        } finally {
+            DatabaseManager.rollbackTransaction();
+            DatabaseManager.disconnect();
+        }
+    }
+
+    @Test
+    public void testGetTaskList_ForWeek() throws SQLException {
+        DatabaseManager.connect(true);
+        try {
+            DatabaseManager.startTransaction();
+
+            // Tasks for the week
+            List<String> tasksForWeek = DatabaseManager.fetchTasksForWeek(3);
+            Assert.assertEquals(5, tasksForWeek.size());
+            Milestone milestone = DatabaseManager
+                    .getMilestones(3)
+                    .stream()
+                    .filter(m -> m.getId() == 5)
+                    .findFirst()
+                    .get();
+            milestone.setDeadline(Date.valueOf(LocalDate.now().plusDays(6)));
+            DatabaseManager.updateMilestone(milestone);
+            tasksForWeek = DatabaseManager.fetchTasksForWeek(3);
+            Assert.assertEquals(7, tasksForWeek.size());
+        } catch (SQLException e) {
+            throw new SQLException("Failed to fetch tasks for the week list.");
+        } finally {
+            DatabaseManager.rollbackTransaction();
+            DatabaseManager.disconnect();
+        }
+    }
+
+    @Test
+    public void testGetTaskList_ForMonth() throws SQLException {
+        DatabaseManager.connect(true);
+        try {
+            DatabaseManager.startTransaction();
+
+            // Tasks for the week
+            List<String> tasksForWeek = DatabaseManager.fetchTasksForWeek(3);
+            Assert.assertEquals(5, tasksForWeek.size());
+            Milestone milestone = DatabaseManager
+                    .getMilestones(3)
+                    .stream()
+                    .filter(m -> m.getId() == 5)
+                    .findFirst()
+                    .get();
+            milestone.setDeadline(Date.valueOf(LocalDate.now().plusDays(28)));
+            DatabaseManager.updateMilestone(milestone);
+            tasksForWeek = DatabaseManager.fetchTasksForMonth(3);
+            Assert.assertEquals(7, tasksForWeek.size());
+        } catch (SQLException e) {
+            throw new SQLException("Failed to fetch tasks for the week list.");
+        } finally {
+            DatabaseManager.rollbackTransaction();
+            DatabaseManager.disconnect();
+        }
+    }
 }
+
+

@@ -30,6 +30,15 @@ public class DatabaseManager {
         }
     }
 
+    public static void startTransaction() throws SQLException {
+        connection.setAutoCommit(false);
+    }
+
+    public static void rollbackTransaction() throws SQLException {
+        connection.rollback();
+        connection.setAutoCommit(true);
+    }
+
     private static <T> T[] selectQuery(PreparedStatement statement, Function<ResultSet, T> function, Function<Integer, T[]> arrayMaker) {
         ArrayList<T> list = new ArrayList<>();
         try {
@@ -374,9 +383,6 @@ public class DatabaseManager {
 
     public static List<String> fetchOverdueTasks(int userId) throws SQLException {
         return getTasks(
-                "SELECT 'C' || m.cat_id || 'M' || m.mil_id || '#' || t.task_id || ' - ' || t.task_name " +
-                        "|| ' (Deadline: ' || TO_CHAR(m.deadline, 'DD-MM-YYYY') || ')'" +
-                        "FROM tasks t " +
                         "JOIN milestones m ON t.mil_id = m.mil_id " +
                         "WHERE t.task_completed IS NULL " +
                         "AND m.deadline < SYSDATE " +
@@ -389,7 +395,7 @@ public class DatabaseManager {
         return getTasks(
                         "JOIN milestones m ON t.mil_id = m.mil_id " +
                         "WHERE t.task_completed IS NULL " +
-                        "AND m.deadline BETWEEN TRUNC(SYSDATE, 'IW') AND TRUNC(SYSDATE, 'IW') + 6 " +
+                        "AND m.deadline BETWEEN SYSDATE AND SYSDATE + 7 " +
                         "AND m.user_id = ?",
                 userId
         );
@@ -399,7 +405,7 @@ public class DatabaseManager {
         return getTasks(
                         "JOIN milestones m ON t.mil_id = m.mil_id " +
                         "WHERE t.task_completed IS NULL " +
-                        "AND m.deadline BETWEEN TRUNC(SYSDATE, 'WW') AND TRUNC(SYSDATE, 'WW') + INTERVAL '1' MONTH " +
+                        "AND m.deadline BETWEEN SYSDATE AND SYSDATE + INTERVAL '1' MONTH " +
                         "AND m.user_id = ?",
                 userId
         );
