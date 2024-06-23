@@ -108,7 +108,7 @@ BEGIN
     FROM   tasks NATURAL JOIN milestones NATURAL JOIN categories
     WHERE  task_id = arg_id;
     
-    IF tsk_completed IS NOT NULL THEN
+    IF tsk_completed IS NULL THEN
         UPDATE tasks      SET task_completed = sysdate          WHERE task_id = arg_id;
         UPDATE milestones SET mil_tasks_done = mst_old_done + 1 WHERE mil_id  = mst_id;
         UPDATE categories SET cat_tasks_done = ctg_old_done + 1 WHERE cat_id  = ctg_id;

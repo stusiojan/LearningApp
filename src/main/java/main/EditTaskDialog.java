@@ -5,6 +5,7 @@ import main.lib.*;
 import javax.swing.*;
 import java.awt.*;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.text.*;
 
@@ -35,16 +36,17 @@ public class EditTaskDialog extends EditDialog {
     protected void onUpdate() {
         String name = nameField.getText();
         String description = descriptionArea.getText();
+        Date date;
 
         // Check if the task has changed completion
-        boolean completedChanged = false;
+        boolean completedChanged;
         if (completedCheckBox.isSelected()) {
             completedChanged = task.getDateCompleted() == null;
-            task.setDateCompleted(dateCompleted);
+            date = dateCompleted;
         }
         else {
             completedChanged = task.getDateCompleted() != null;
-            task.setDateCompleted(null);
+            date = null;
         }
 
         boolean changed = completedChanged;
@@ -58,6 +60,7 @@ public class EditTaskDialog extends EditDialog {
         if (completedChanged) {
             DatabaseManager.switchTaskDone(task.getId());
         }
+        task.setDateCompleted(date);
     }
 
     protected void onDelete() {

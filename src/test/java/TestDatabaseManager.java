@@ -242,6 +242,134 @@ public class TestDatabaseManager {
             DatabaseManager.disconnect();
         }
     }
+
+    @Test
+    public void testAddDeleteMilestone() {
+        DatabaseManager.connect(true);
+
+        DatabaseManager.addMilestone("test", 1, 1);
+
+        Milestone mil = DatabaseManager.getMilestones(1).getLast();
+        Assert.assertEquals("test", mil.getName());
+        Assert.assertEquals(Date.valueOf(LocalDate.now()).toString(), mil.getDateAdded().toString());
+        Assert.assertEquals(Date.valueOf(LocalDate.now()).toString(), mil.getDeadline().toString());
+        Assert.assertEquals(Date.valueOf(LocalDate.now()).toString(), mil.getDateCompleted().toString());
+        Assert.assertNull(mil.getDescription());
+        Assert.assertEquals(0, mil.getTasksAll());
+        Assert.assertEquals(0, mil.getTasksDone());
+        Assert.assertEquals(1, mil.getUserId());
+        Assert.assertEquals(1, mil.getCategoryId());
+        DatabaseManager.deleteMilestone(mil.getId());
+
+        DatabaseManager.disconnect();
+    }
+
+    @Test
+    public void testTaskCount() {
+        DatabaseManager.connect(true);
+
+        DatabaseManager.addCategory("test");
+        Category cat = DatabaseManager.getCategories()[DatabaseManager.getCategories().length - 1];
+
+        DatabaseManager.addMilestone("test", 1, cat.getId());
+        Milestone mil = DatabaseManager.getMilestones(1).getLast();
+
+        mil.setDeadline(Date.valueOf(LocalDate.now().minusDays(5)));
+        DatabaseManager.updateMilestone(mil);
+
+        int overdue = DatabaseManager.countTasksOverdue();
+        int week = DatabaseManager.countTasksForWeek();
+        int month = DatabaseManager.countTasksForMonth();
+
+        DatabaseManager.addTask("test", mil.getId());
+        Task task = DatabaseManager.getTasks(mil.getId())[0];
+
+        Assert.assertEquals(overdue + 1, DatabaseManager.countTasksOverdue());
+        Assert.assertEquals(week + 1, DatabaseManager.countTasksForWeek());
+        Assert.assertEquals(month + 1, DatabaseManager.countTasksForMonth());
+
+        DatabaseManager.switchTaskDone(task.getId());
+
+        Assert.assertEquals(overdue, DatabaseManager.countTasksOverdue());
+        Assert.assertEquals(week, DatabaseManager.countTasksForWeek());
+        Assert.assertEquals(month, DatabaseManager.countTasksForMonth());
+
+        DatabaseManager.switchTaskDone(task.getId());
+        mil.setDeadline(Date.valueOf(LocalDate.now().plusDays(5)));
+        DatabaseManager.updateMilestone(mil);
+
+        Assert.assertEquals(overdue, DatabaseManager.countTasksOverdue());
+        Assert.assertEquals(week + 1, DatabaseManager.countTasksForWeek());
+        Assert.assertEquals(month + 1, DatabaseManager.countTasksForMonth());
+
+        mil.setDeadline(Date.valueOf(LocalDate.now().plusDays(10)));
+        DatabaseManager.updateMilestone(mil);
+
+        Assert.assertEquals(overdue, DatabaseManager.countTasksOverdue());
+        Assert.assertEquals(week, DatabaseManager.countTasksForWeek());
+        Assert.assertEquals(month + 1, DatabaseManager.countTasksForMonth());
+
+        mil.setDeadline(Date.valueOf(LocalDate.now().plusDays(50)));
+        DatabaseManager.updateMilestone(mil);
+
+        Assert.assertEquals(overdue, DatabaseManager.countTasksOverdue());
+        Assert.assertEquals(week, DatabaseManager.countTasksForWeek());
+        Assert.assertEquals(month, DatabaseManager.countTasksForMonth());
+
+        DatabaseManager.deleteTask(task.getId());
+        DatabaseManager.deleteMilestone(mil.getId());
+        DatabaseManager.deleteCategory(cat.getId());
+
+        DatabaseManager.disconnect();
+    }
+
+    @Test
+    public void testTaskTriggersSwitch() {
+        DatabaseManager.connect(true);
+
+        DatabaseManager.addCategory("test");
+        Category cat = DatabaseManager.getCategories()[DatabaseManager.getCategories().length - 1];
+
+        DatabaseManager.addMilestone("test", 1, cat.getId());
+        Milestone mil = DatabaseManager.getMilestones(1).getLast();
+
+        DatabaseManager.addTask("test", mil.getId());
+        Task task = DatabaseManager.getTasks(mil.getId())[0];
+        cat = DatabaseManager.getCategory(cat.getId());
+        mil = DatabaseManager.getMilestone(mil.getId());
+
+        Assert.assertEquals(1, cat.getTasksAll());
+        Assert.assertEquals(0, cat.getTasksDone());
+        Assert.assertEquals(1, mil.getTasksAll());
+        Assert.assertEquals(0, mil.getTasksDone());
+        Assert.assertNull(mil.getDateCompleted());
+
+        DatabaseManager.switchTaskDone(task.getId());
+        cat = DatabaseManager.getCategory(cat.getId());
+        mil = DatabaseManager.getMilestone(mil.getId());
+
+        Assert.assertEquals(1, cat.getTasksAll());
+        Assert.assertEquals(1, cat.getTasksDone());
+        Assert.assertEquals(1, mil.getTasksAll());
+        Assert.assertEquals(1, mil.getTasksDone());
+        Assert.assertNotNull(mil.getDateCompleted());
+
+        DatabaseManager.switchTaskDone(task.getId());
+        DatabaseManager.deleteTask(task.getId());
+        cat = DatabaseManager.getCategory(cat.getId());
+        mil = DatabaseManager.getMilestone(mil.getId());
+
+        Assert.assertEquals(0, cat.getTasksAll());
+        Assert.assertEquals(0, cat.getTasksDone());
+        Assert.assertEquals(0, mil.getTasksAll());
+        Assert.assertEquals(0, mil.getTasksDone());
+        Assert.assertNotNull(mil.getDateCompleted());
+
+        DatabaseManager.deleteMilestone(mil.getId());
+        DatabaseManager.deleteCategory(cat.getId());
+
+        DatabaseManager.disconnect();
+    }
 }
 
 

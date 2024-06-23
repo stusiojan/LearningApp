@@ -96,13 +96,13 @@ public class TaskDetailsDialog extends DetailsDialog {
         task = new Task(
                 this.task.getId(),
                 taskNameField.getText(),
-                completeCheckBox.isSelected() ? new Date(System.currentTimeMillis()) : null,
+                this.task.getDateCompleted(),
                 taskDescriptionField.getText(),
                 this.task.getMilestoneId()
         );
 
         DatabaseManager.updateTask(task);
-        if (completeCheckBox.isSelected() && this.task.getDateCompleted() == null) {
+        if (completeCheckBox.isSelected() ^ this.task.getDateCompleted() != null) {
             DatabaseManager.switchTaskDone(task.getId());
         }
         refreshCallback.run();

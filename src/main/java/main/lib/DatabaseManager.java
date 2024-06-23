@@ -336,7 +336,6 @@ public class DatabaseManager {
         }
     }
 
-    // To be called after the value of task_completed has changed.
     public static void switchTaskDone(int taskId) {
         try {
             CallableStatement statement = connection.prepareCall("CALL switch_task_done(?)");
@@ -424,8 +423,9 @@ public class DatabaseManager {
         String outputQuery =
                 "SELECT 'C' || m.cat_id || 'M' || m.mil_id || '#' || t.task_id || ' - ' || t.task_name " +
                 "|| '$#' || TO_CHAR(m.deadline, 'DD-MM-YYYY') " +
-                "FROM tasks t "
-                        + query;
+                "FROM tasks t " +
+                query +
+                " ORDER BY m.deadline";
         List<String> tasks = new ArrayList<>();
         try {
             PreparedStatement statement = connection.prepareStatement(outputQuery);
@@ -438,6 +438,30 @@ public class DatabaseManager {
             throw new SQLException("Failed to get list of tasks: " + e.getMessage());
         }
         return tasks;
+    }
+
+    // here the count for week/month includes overdue tasks
+    private static int countTasks(String query) {
+        try {
+            PreparedStatement statement = connection.prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            return resultSet.getInt(1);
+        }  catch (SQLException e) {
+            throw new RuntimeException("Failed to count tasks: " + e);
+        }
+    }
+
+    public static int countTasksOverdue() {
+        return countTasks("SELECT task_count_overdue() FROM DUAL");
+    }
+
+    public static int countTasksForWeek() {
+        return countTasks("SELECT task_count_week() FROM DUAL");
+    }
+
+    public static int countTasksForMonth() {
+        return countTasks("SELECT task_count_month() FROM DUAL");
     }
 }
 

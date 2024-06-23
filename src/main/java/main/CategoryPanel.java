@@ -343,7 +343,7 @@ public class CategoryPanel extends JPanel implements ActionListener, TreeSelecti
         public Component getListCellRendererComponent(JList<? extends Object> list, Object obj, int index,
                                                       boolean isSelected, boolean cellHasFocus) {   
             var task = (Task)obj;
-            super.getListCellRendererComponent(list, task.getName(), index, isSelected, cellHasFocus);
+            super.getListCellRendererComponent(list, task.dateCompletedToString() + " - " + task.getName(), index, isSelected, cellHasFocus);
             return this;
         } 
     }
