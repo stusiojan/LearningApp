@@ -21,7 +21,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 
 public class DashboardPanel extends JPanel implements ActionListener {
@@ -111,7 +110,7 @@ public class DashboardPanel extends JPanel implements ActionListener {
         });
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createCalendarPanel(), createTaskListPanel());
-        splitPane.setDividerLocation(400);
+        splitPane.setResizeWeight(0.80);
         add(splitPane, BorderLayout.CENTER);
     }
 
