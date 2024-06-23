@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.Optional;
-import java.time.LocalDate;
 
 /** The "static" class dealing with database connection. */
 public class DatabaseManager {
@@ -111,7 +110,7 @@ public class DatabaseManager {
     }
 
     public static boolean hasUser(String login) {
-        return !getSalt(login).equals("EMPTY");     // FIXME(?): Could be done better
+        return !getSalt(login).equals("EMPTY");
     }
 
     public static void addUser(String login, String hash, String salt) {
@@ -237,30 +236,24 @@ public class DatabaseManager {
     }
 
     public static int addMilestone(String milestoneName, int userId, int categoryId) {
-        Date dateAdded = Date.valueOf(LocalDate.now());
-        Date deadline = Date.valueOf(LocalDate.now().plusWeeks(1));
-
-        String sql = "INSERT INTO milestones (mil_name, date_added, deadline, mil_description, user_id, cat_id) VALUES (?, ?, ?, ?, ?, ?)";
         try {
-            String[] returns = { "mil_id" };
-            PreparedStatement statement = connection.prepareStatement(sql, returns);
-            statement.setString(1, milestoneName);
-            statement.setDate(2, dateAdded);
-            statement.setDate(3, deadline);
-            statement.setString(4, "");      
-            statement.setInt(5, userId);
-            statement.setInt(6, categoryId);     
-            statement.executeUpdate();
+            var call = connection.prepareCall("CALL create_empty_milestone(?, ?, ?)");
+            call.setString(1, milestoneName);
+            call.setInt(2, userId);
+            call.setInt(3, categoryId);
+            call.execute();
+            call.close();
 
             int id;
-            ResultSet result = statement.getGeneratedKeys();
+            var stmt = connection.createStatement();
+            ResultSet result = stmt.executeQuery("SELECT max(mil_id) FROM milestones");
             if (result.next())
                 id = result.getInt(1);
             else
                 throw new SQLException("Failed to obtain category id.");
-            statement.close();
+            stmt.close();
             return id;
-        } catch (SQLException e) {
+        }  catch (SQLException e) {
             throw new RuntimeException("Failed to add new milestone: " + e);
         }
     }
