@@ -8,8 +8,6 @@ import java.awt.*;
 
 public class EditCategoryDialog extends EditDialog {
     private Category category;
-    private JTextField nameField;
-    private JTextArea descriptionArea;
 
     public EditCategoryDialog(JFrame parent, Category category) {
         super(parent, "category", category.getName(), category.getDescription());
