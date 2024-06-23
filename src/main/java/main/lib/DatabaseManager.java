@@ -383,9 +383,6 @@ public class DatabaseManager {
 
     public static List<String> fetchOverdueTasks(int userId) throws SQLException {
         return getTasks(
-                "SELECT 'C' || m.cat_id || 'M' || m.mil_id || '#' || t.task_id || ' - ' || t.task_name " +
-                        "|| ' (Deadline: ' || TO_CHAR(m.deadline, 'DD-MM-YYYY') || ')'" +
-                        "FROM tasks t " +
                         "JOIN milestones m ON t.mil_id = m.mil_id " +
                         "WHERE t.task_completed IS NULL " +
                         "AND m.deadline < SYSDATE " +

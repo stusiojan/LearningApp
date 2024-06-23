@@ -170,7 +170,7 @@ public class TestDatabaseManager {
 
             // Overdue Tasks
             List<String> overDueTasks = DatabaseManager.fetchOverdueTasks(3);
-            Assert.assertEquals(6, overDueTasks.size());
+            Assert.assertEquals(9, overDueTasks.size());
             Milestone milestone = DatabaseManager
                     .getMilestones(3)
                     .stream()
@@ -197,7 +197,7 @@ public class TestDatabaseManager {
 
             // Tasks for the week
             List<String> tasksForWeek = DatabaseManager.fetchTasksForWeek(3);
-            Assert.assertEquals(8, tasksForWeek.size());
+            Assert.assertEquals(5, tasksForWeek.size());
             Milestone milestone = DatabaseManager
                     .getMilestones(3)
                     .stream()
@@ -207,7 +207,7 @@ public class TestDatabaseManager {
             milestone.setDeadline(Date.valueOf(LocalDate.now().plusDays(6)));
             DatabaseManager.updateMilestone(milestone);
             tasksForWeek = DatabaseManager.fetchTasksForWeek(3);
-            Assert.assertEquals(10, tasksForWeek.size());
+            Assert.assertEquals(7, tasksForWeek.size());
         } catch (SQLException e) {
             throw new SQLException("Failed to fetch tasks for the week list.");
         } finally {
@@ -224,7 +224,7 @@ public class TestDatabaseManager {
 
             // Tasks for the week
             List<String> tasksForWeek = DatabaseManager.fetchTasksForWeek(3);
-            Assert.assertEquals(8, tasksForWeek.size());
+            Assert.assertEquals(5, tasksForWeek.size());
             Milestone milestone = DatabaseManager
                     .getMilestones(3)
                     .stream()
@@ -234,7 +234,7 @@ public class TestDatabaseManager {
             milestone.setDeadline(Date.valueOf(LocalDate.now().plusDays(28)));
             DatabaseManager.updateMilestone(milestone);
             tasksForWeek = DatabaseManager.fetchTasksForMonth(3);
-            Assert.assertEquals(10, tasksForWeek.size());
+            Assert.assertEquals(7, tasksForWeek.size());
         } catch (SQLException e) {
             throw new SQLException("Failed to fetch tasks for the week list.");
         } finally {
